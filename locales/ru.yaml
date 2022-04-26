@@ -7,6 +7,11 @@ thanks: 'Спасибо!'
 newUser: 'Новая анкета: \n\nИмя: ${name} \nНомер: ${number}'
 requestLocation: '📍 Получить локацию'
 newPost: 'New post: \n\nCategory: ${category} \nDescription: ${description} \nPrice: ${price}'
+category: 'Категория'
+description: 'Описание'
+price: 'Цена'
+image: 'Изображения'
+confirm: 'Подтвердить'
 
 buttons:
   contacts: 'Контакты'
@@ -15,10 +20,3 @@ buttons:
   sendLocation: '📍 Отправить локацию'
   addPost: 'Подать'
   description: 'ADD'
-
-addPost:
-  category: 'Category'
-  description: 'Description'
-  price: 'Price'
-  image: 'Image'
-  confirm: 'Confirm'
