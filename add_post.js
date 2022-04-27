@@ -4,27 +4,32 @@ const Extra = require('telegraf/extra')
 const data = require('./data')
 
 const addPost = new WizardScene('add-post',
-    ({wizard, i18n, replyWithHTML, telegram, ctx}) => {
+    ({wizard, i18n, replyWithHTML, session}) => {
+        const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.rent')]
+        session.image = []
+        session.buttons = buttons
         replyWithHTML(
             i18n.t('category'),
             Extra
                 .markup(Markup.inlineKeyboard([
-                    [Markup.callbackButton(i18n.t('categories.sell'), i18n.t('categories.sell')), Markup.callbackButton(i18n.t('categories.buy'), i18n.t('categories.buy'))],
-                    [Markup.callbackButton(i18n.t('categories.service'), i18n.t('categories.service')), Markup.callbackButton(i18n.t('categories.rent'), i18n.t('categories.rent'))]
+                    [Markup.callbackButton(buttons[0], buttons[0]), Markup.callbackButton(buttons[1], buttons[1])],
+                    [Markup.callbackButton(buttons[2], buttons[2]), Markup.callbackButton(buttons[3], buttons[3])],
                 ]))
         )
         return wizard.next()
     },
-    ({wizard, session, scene, message, chat, i18n, replyWithHTML}) => {
-        session.image = []
-
-        if (message.text == '/start') {
-            return scene.enter('add-post')
+    async ({wizard, session, scene, message, chat, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup}) => {
+        const buttons = session.buttons
+        if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
+            return replyWithHTML(
+                i18n.t('category'),
+                Extra
+                    .markup(Markup.inlineKeyboard([
+                        [Markup.callbackButton(buttons[0], buttons[0]), Markup.callbackButton(buttons[1], buttons[1])],
+                        [Markup.callbackButton(buttons[2], buttons[2]), Markup.callbackButton(buttons[3], buttons[3])],
+                    ])))
         }
 
-        if (+chat.id < 0) {
-            return
-        }
         replyWithHTML(
             i18n.t('image'), Extra
                 .markup(Markup.removeKeyboard(true))
@@ -33,7 +38,7 @@ const addPost = new WizardScene('add-post',
     },
 
     async ({wizard, session, scene, message, i18n, replyWithHTML, chat}) => {
-        if (!message.photo) {
+        if (!message || !message.photo) {
             return replyWithHTML(i18n.t('image')), Extra
                 .markup(Markup.removeKeyboard(true))
         }
@@ -54,18 +59,12 @@ const addPost = new WizardScene('add-post',
     },
 
 
-    async ({wizard, session, scene, message, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup}) => {
+    async ({wizard, session, scene, message, i18n, replyWithHTML, callbackQuery}) => {
         if (message && message.text == '/start') {
             return scene.enter('add-post')
         }
-        await editMessageReplyMarkup({
-            reply_markup: {remove_keyboard: true},
-        })
 
-        const cb = callbackQuery.data
-        console.log("CB", cb)
-        if (cb === i18n.t('buttons.addPhoto')) {
-            replyWithHTML(i18n.t('image'))
+        if (!callbackQuery || !callbackQuery.data && callbackQuery.data === i18n.t('buttons.addPhoto')) {
             return wizard.back()
         }
         replyWithHTML(

@@ -16,13 +16,16 @@ image: 'Image'
 confirm: 'Confirm'
 yes: 'Yes'
 no: 'No'
+welcome: 'ℹ️ Главное меню \n\nДобро пожаловать, дорогой житель! \n\nС помощью этого бота вы можете подавать  объявления в InnoAds.'
+
+
 
 buttons: 
   contacts: 'Contacts'
   signUp: 'Sign up'
   sendNumber: '📱 Send number'
   sendLocation: '📍 Send location'
-  addPost: 'Add Post'
+  addPost: '🪧 Add Post'
   addPhoto: 'Add Photo'
   stop: 'Stop'
   next: 'Next'

@@ -10,9 +10,9 @@ const addPost = require('./add_post')
 const TelegrafI18n = require('telegraf-i18n')
 
 const i18n = new TelegrafI18n({
-    defaultLanguage: 'en',
+    defaultLanguage: 'ru',
     allowMissing: false,
-    directory: path.resolve(__dirname, 'locales')
+    directory: path.resolve(__dirname, 'locales'),
 })
 
 const bot = new Telegraf(data.token)
@@ -27,15 +27,15 @@ bot.use(stage.middleware())
 
 bot.start(({i18n, replyWithHTML}) => {
     return replyWithHTML(
-        i18n.t('whatDo'),
+        i18n.t('welcome'),
         // Extra
         //     .markup(Markup.inlineKeyboard([
         //         [Markup.callbackButton(i18n.t('buttons.addPost'), i18n.t('buttons.addPost'))],
         //     ]))
         Extra
             .markup(Markup.keyboard([
-                [i18n.t('buttons.signUp')]
-            ]).resize())
+                [i18n.t('buttons.addPost')]
+            ]).resize().oneTime())
     )
 })
 
@@ -47,12 +47,13 @@ bot.hears(TelegrafI18n.match('buttons.contacts'), ({i18n, replyWithHTML}) => {
     replyWithHTML(i18n.t('ourNumber'))
 })
 
-bot.hears(TelegrafI18n.match('buttons.signUp'), (ctx) => {
-    ctx.scene.enter('super-wizard')
-})
+// bot.hears(TelegrafI18n.match('buttons.signUp'), (ctx) => {
+//     ctx.scene.enter('super-wizard')
+// })
 
 bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
     ctx.scene.enter('add-post')
+
 })
 
 bot.action(/loc_*/, (ctx) => {
