@@ -4,18 +4,20 @@ const Extra = require('telegraf/extra')
 const data = require('./data')
 
 const addPost = new WizardScene('add-post',
-
-    async ({wizard, i18n, replyWithHTML, telegram, ctx}) => {
-
+    ({wizard, i18n, replyWithHTML, telegram, ctx}) => {
         replyWithHTML(
             i18n.t('category'),
             Extra
-                .markup(Markup.removeKeyboard(true))
+                .markup(Markup.inlineKeyboard([
+                    [Markup.callbackButton(i18n.t('categories.sell'), i18n.t('categories.sell')), Markup.callbackButton(i18n.t('categories.buy'), i18n.t('categories.buy'))],
+                    [Markup.callbackButton(i18n.t('categories.service'), i18n.t('categories.service')), Markup.callbackButton(i18n.t('categories.rent'), i18n.t('categories.rent'))]
+                ]))
         )
         return wizard.next()
     },
-
     ({wizard, session, scene, message, chat, i18n, replyWithHTML}) => {
+        session.image = []
+
         if (message.text == '/start') {
             return scene.enter('add-post')
         }
@@ -23,86 +25,75 @@ const addPost = new WizardScene('add-post',
         if (+chat.id < 0) {
             return
         }
-
-        if (!message.text && session.category) {
-            return replyWithHTML(i18n.t('category'))
-        }
-
         replyWithHTML(
-            i18n.t('description'),
-            // Extra
-            //   .markup(Markup.keyboard([
-            //     [Markup.contactRequestButton(i18n.t('buttons.sendNumber'))]
-            //   ]).resize().oneTime())
+            i18n.t('image'), Extra
+                .markup(Markup.removeKeyboard(true))
         )
-
-        session.category = message.text
         return wizard.next()
     },
 
-    ({wizard, session, scene, message, i18n, replyWithHTML}) => {
-        if (message.text == '/start') {
-            return scene.enter('add-post')
+    async ({wizard, session, scene, message, i18n, replyWithHTML, chat}) => {
+        if (!message.photo) {
+            return replyWithHTML(i18n.t('image')), Extra
+                .markup(Markup.removeKeyboard(true))
         }
-
-        if (!message.text && !message.description) {
-            return replyWithHTML(i18n.t('description'))
-        }
+        const currentImage = message.photo[0].file_id
+        session.image = [...session.image, currentImage]
 
         replyWithHTML(
-            i18n.t('price'),
-            // Extra
-            //   .markup(Markup.keyboard([
-            //     [Markup.locationRequestButton(i18n.t('buttons.sendLocation'))]
-            //   ]).resize().oneTime())
+            i18n.t('buttons.addPhoto') + '?',
+            Extra
+                .markup(Markup.inlineKeyboard([
+                    [Markup.callbackButton(i18n.t('buttons.addPhoto'), i18n.t('buttons.addPhoto'))],
+                    [Markup.callbackButton(i18n.t('buttons.stop'), i18n.t('buttons.stop'))]
+                ]))
         )
 
-        session.description = String(message.text);
+
         return wizard.next()
     },
 
 
-    ({wizard, session, scene, message, i18n, replyWithHTML}) => {
-        if (message.text == '/start') {
+    async ({wizard, session, scene, message, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup}) => {
+        if (message && message.text == '/start') {
             return scene.enter('add-post')
         }
+        await editMessageReplyMarkup({
+            reply_markup: {remove_keyboard: true},
+        })
 
-        if (!message.text) {
-            return replyWithHTML(i18n.t('price'))
+        const cb = callbackQuery.data
+        console.log("CB", cb)
+        if (cb === i18n.t('buttons.addPhoto')) {
+            replyWithHTML(i18n.t('image'))
+            return wizard.back()
         }
-
         replyWithHTML(
-            i18n.t('image'),
-            // Extra
-            //   .markup(Markup.keyboard([
-            //     [Markup.locationRequestButton(i18n.t('buttons.sendLocation'))]
-            //   ]).resize().oneTime())
+            i18n.t('confirm') + '?',
+            Extra
+                .markup(Markup.inlineKeyboard([
+                    [Markup.callbackButton(i18n.t('yes'), i18n.t('yes'))],
+                    [Markup.callbackButton(i18n.t('no'), i18n.t('no'))]
+                ]))
         )
-        session.price = Number(message.text)
         return wizard.next()
     },
 
     async (ctx) => {
-        const {scene, session, message, i18n, replyWithHTML, telegram,} = ctx
-        let res = []
-        // console.log("image", ctx)
-
-        if (message.text == '/start') {
-            return scene.enter('add-post')
-        }
-
-
-        if (message.photo.length === 0) {
-            return replyWithHTML(
-                i18n.t('image'),
-                // Extra
-                //   .markup(Markup.keyboard([
-                //     [Markup.locationRequestButton(i18n.t('buttons.sendLocation'))]
-                //   ]).resize().oneTime())
+        const {scene, session, message, i18n, replyWithHTML, telegram, callbackQuery, editMessageReplyMarkup} = ctx
+        await editMessageReplyMarkup({
+            reply_markup: {remove_keyboard: true},
+        })
+        const cb = callbackQuery.data
+        console.log("CB", cb)
+        if (cb === i18n.t('no')) {
+            replyWithHTML(
+                'NEXT TIME!',
+                Extra
+                    .markup(Markup.removeKeyboard(true))
             )
+            return scene.leave()
         }
-        session.image = message.photo[0].file_id
-
         replyWithHTML(
             i18n.t('thanks'),
             Extra
@@ -117,28 +108,17 @@ const addPost = new WizardScene('add-post',
                     description: session.description,
                     price: session.price,
                 }
-            ),
-            // Extra
-            //   .markup(Markup.inlineKeyboard([
-            //     [Markup.callbackButton(i18n.t('getLocation'), `loc_${message.location.latitude}_${message.location.longitude}`)]
-            //   ]))
+            )
         )
 
-
-        await telegram.sendPhoto(
-            data.chatId, session.image
+        await telegram.sendMediaGroup(
+            data.chatId, session.image.map((img) => {
+                return {
+                    "type": "photo",
+                    "media": img
+                }
+            })
         )
-
-
-        // await telegram.sendMediaGroup(
-        //     data.chatId, [{
-        //         "type": "photo",
-        //         "media": res[0]
-        //     }, {
-        //         "type": "photo",
-        //         "media": res[1]
-        //     }]
-        // )
 
         scene.leave()
     }

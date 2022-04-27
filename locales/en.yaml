@@ -14,6 +14,8 @@ description: 'Description'
 price: 'Price'
 image: 'Image'
 confirm: 'Confirm'
+yes: 'Yes'
+no: 'No'
 
 buttons: 
   contacts: 'Contacts'
@@ -21,4 +23,13 @@ buttons:
   sendNumber: '📱 Send number'
   sendLocation: '📍 Send location'
   addPost: 'Add Post'
-  description: 'ADD'
+  addPhoto: 'Add Photo'
+  stop: 'Stop'
+  next: 'Next'
+  back: 'Back'
+
+categories:
+  sell: 'sell'
+  buy: 'buy'
+  rent: 'rent'
+  service: 'service'

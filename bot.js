@@ -1,12 +1,11 @@
 const Telegraf = require('telegraf')
 const path = require('path')
-const Composer = require('telegraf/composer')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
 const data = require('./data')
-// const superWizard = require('./wizard')
+const superWizard = require('./wizard')
 const addPost = require('./add_post')
 const TelegrafI18n = require('telegraf-i18n')
 
@@ -18,7 +17,7 @@ const i18n = new TelegrafI18n({
 
 const bot = new Telegraf(data.token)
 const stage = new Stage()
-// stage.register(superWizard)
+stage.register(superWizard)
 stage.register(addPost)
 
 bot.use(i18n.middleware())
@@ -27,23 +26,21 @@ bot.use(stage.middleware())
 
 
 bot.start(({i18n, replyWithHTML}) => {
-    replyWithHTML(
+    return replyWithHTML(
         i18n.t('whatDo'),
+        // Extra
+        //     .markup(Markup.inlineKeyboard([
+        //         [Markup.callbackButton(i18n.t('buttons.addPost'), i18n.t('buttons.addPost'))],
+        //     ]))
         Extra
             .markup(Markup.keyboard([
-                [i18n.t('buttons.addPost')]
+                [i18n.t('buttons.signUp')]
             ]).resize())
     )
 })
 
-// bot.start(({ i18n, replyWithHTML }) => {
-//   replyWithHTML(
-//   i18n.t('whatDo'),
-//   Extra
-//     .markup(Markup.keyboard([
-//       [i18n.t('buttons.signUp'), i18n.t('buttons.contacts'), i18n.t('buttons.addPost')]
-//     ]).resize())
-//   )
+// bot.action(TelegrafI18n.match('buttons.addPost'), (ctx) => {
+//     ctx.scene.enter('add-post')
 // })
 
 bot.hears(TelegrafI18n.match('buttons.contacts'), ({i18n, replyWithHTML}) => {
