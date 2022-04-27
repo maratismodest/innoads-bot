@@ -4,7 +4,9 @@ const Extra = require('telegraf/extra')
 const data = require('./data')
 
 const addPost = new WizardScene('add-post',
-    ({wizard, i18n, replyWithHTML, session}) => {
+    //Category
+    (ctx) => {
+        const {wizard, i18n, replyWithHTML, session} = ctx;
         const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.rent')]
         session.image = []
         session.buttons = buttons
@@ -18,7 +20,9 @@ const addPost = new WizardScene('add-post',
         )
         return wizard.next()
     },
-    async ({wizard, session, scene, message, chat, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup}) => {
+    //Description
+    async (ctx) => {
+        const {wizard, session, i18n, replyWithHTML, callbackQuery} = ctx
         const buttons = session.buttons
         if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
             return replyWithHTML(
@@ -29,16 +33,62 @@ const addPost = new WizardScene('add-post',
                         [Markup.callbackButton(buttons[2], buttons[2]), Markup.callbackButton(buttons[3], buttons[3])],
                     ])))
         }
-
+        session.category = callbackQuery.data
         replyWithHTML(
-            i18n.t('image'), Extra
+            i18n.t('description'), Extra
                 .markup(Markup.removeKeyboard(true))
         )
         return wizard.next()
     },
+    //Price
+    async (ctx) => {
+        const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-    async ({wizard, session, scene, message, i18n, replyWithHTML, chat}) => {
-        if (!message || !message.photo) {
+        if (message.text == '/start') {
+            return scene.enter('super-wizard')
+        }
+
+        if (+chat.id < 0) {
+            return
+        }
+
+        if (!message.text) {
+            return replyWithHTML(i18n.t('description'))
+        }
+        session.description = message.text
+        replyWithHTML(
+            i18n.t('price'), Extra
+                .markup(Markup.removeKeyboard(true))
+        )
+        return wizard.next()
+    },
+    async (ctx) => {
+        const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
+
+        if (message.text == '/start') {
+            return scene.enter('super-wizard')
+        }
+
+        if (+chat.id < 0) {
+            return
+        }
+
+        if (!message.text) {
+            return replyWithHTML(i18n.t('price'))
+        }
+        session.price = message.text
+        replyWithHTML(
+            i18n.t('image'), Extra
+                .markup(Markup.removeKeyboard(true))
+        )
+
+        return wizard.next()
+    },
+
+    async (ctx) => {
+        const {wizard, session, scene, message, i18n, replyWithHTML} = ctx
+
+        if (!message.photo || !message.photo.length || message.photo.length === 0) {
             return replyWithHTML(i18n.t('image')), Extra
                 .markup(Markup.removeKeyboard(true))
         }
@@ -57,14 +107,16 @@ const addPost = new WizardScene('add-post',
 
         return wizard.next()
     },
-
-
-    async ({wizard, session, scene, message, i18n, replyWithHTML, callbackQuery}) => {
+    async (ctx) => {
+        const {wizard, scene, message, i18n, replyWithHTML, callbackQuery} = ctx
         if (message && message.text == '/start') {
             return scene.enter('add-post')
         }
 
-        if (!callbackQuery || !callbackQuery.data && callbackQuery.data === i18n.t('buttons.addPhoto')) {
+        if (callbackQuery.data === i18n.t('buttons.addPhoto')) {
+            // console.log("data", callbackQuery.data)
+            replyWithHTML(i18n.t('image')), Extra
+                .markup(Markup.removeKeyboard(true))
             return wizard.back()
         }
         replyWithHTML(
@@ -79,12 +131,13 @@ const addPost = new WizardScene('add-post',
     },
 
     async (ctx) => {
-        const {scene, session, message, i18n, replyWithHTML, telegram, callbackQuery, editMessageReplyMarkup} = ctx
+        const {scene, session, message, i18n, replyWithHTML, telegram, callbackQuery, editMessageReplyMarkup, chat} = ctx
+        // console.log("chat",chat)
         await editMessageReplyMarkup({
             reply_markup: {remove_keyboard: true},
         })
         const cb = callbackQuery.data
-        console.log("CB", cb)
+        // console.log("CB", cb)
         if (cb === i18n.t('no')) {
             replyWithHTML(
                 'NEXT TIME!',
@@ -99,22 +152,36 @@ const addPost = new WizardScene('add-post',
                 .markup(Markup.removeKeyboard(true))
         )
 
-        await telegram.sendMessage(
-            data.chatId,
-            i18n.t(
-                'newPost', {
-                    category: session.category,
-                    description: session.description,
-                    price: session.price,
-                }
-            )
-        )
+        // await telegram.sendMessage(
+        //     data.chatId,
+        //     i18n.t(
+        //         'newPost', {
+        //             category: session.category,
+        //             description: session.description,
+        //             price: session.price,
+        //         }
+        //     )
+        // )
 
         await telegram.sendMediaGroup(
-            data.chatId, session.image.map((img) => {
+            data.chatId, session.image.map((img, index) => {
+                if (index === 0) {
+                    return {
+                        "type": "photo",
+                        "media": img,
+                        "caption": i18n.t(
+                            'newPost', {
+                                category: session.category,
+                                description: session.description,
+                                price: session.price,
+                                alias: chat.username
+                            }
+                        )
+                    }
+                }
                 return {
                     "type": "photo",
-                    "media": img
+                    "media": img,
                 }
             })
         )

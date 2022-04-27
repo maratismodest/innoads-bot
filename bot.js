@@ -5,7 +5,7 @@ const Stage = require('telegraf/stage')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
 const data = require('./data')
-const superWizard = require('./wizard')
+// const superWizard = require('./wizard')
 const addPost = require('./add_post')
 const TelegrafI18n = require('telegraf-i18n')
 
@@ -13,11 +13,12 @@ const i18n = new TelegrafI18n({
     defaultLanguage: 'ru',
     allowMissing: false,
     directory: path.resolve(__dirname, 'locales'),
+    locale: 'ru'
 })
 
 const bot = new Telegraf(data.token)
 const stage = new Stage()
-stage.register(superWizard)
+// stage.register(superWizard)
 stage.register(addPost)
 
 bot.use(i18n.middleware())
