@@ -33,6 +33,16 @@ const addPost = new WizardScene('add-post',
         const buttons = session.buttons
         if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
             return
+            //just ignore other actions !!
+            // replyWithHTML(
+            //     i18n.t('category'),
+            //     Extra
+            //         .markup(Markup.inlineKeyboard([
+            //             [Markup.callbackButton(buttons[0], buttons[0])],
+            //             [Markup.callbackButton(buttons[1], buttons[1])],
+            //             [Markup.callbackButton(buttons[2], buttons[2])],
+            //             [Markup.callbackButton(buttons[3], buttons[3])],
+            //         ])))
         }
         session.category = callbackQuery.data
         replyWithHTML(
@@ -54,11 +64,11 @@ const addPost = new WizardScene('add-post',
         }
 
         if (!message.text) {
-            return replyWithHTML(i18n.t('description'))
+            return replyWithHTML(`Категория: #${session.category} \n${i18n.t('description')}`)
         }
         session.description = message.text
         replyWithHTML(
-            i18n.t('price'), Extra
+            `Категория: #${session.category} \n\nОписание: ${session.description} \n\n${i18n.t('price')}`, Extra
                 .markup(Markup.removeKeyboard(true))
         )
         return wizard.next()
@@ -80,7 +90,7 @@ const addPost = new WizardScene('add-post',
         }
         session.price = message.text
         replyWithHTML(
-            i18n.t('image'), Extra
+            `Категория: #${session.category} \n\nОписание: ${session.description} \n\nЦена: ${session.price} \n\n${i18n.t('image')}`, Extra
                 .markup(Markup.removeKeyboard(true))
         )
 
@@ -106,6 +116,9 @@ const addPost = new WizardScene('add-post',
         }
         if (!message.photo || !message.photo.length || message.photo.length === 0) {
             return
+            //just ignore other actions !!
+            // return replyWithHTML(i18n.t('image')), Extra
+            //     .markup(Markup.removeKeyboard(true))
         }
         const currentImage = message.photo[0].file_id
         session.image = [...session.image, currentImage]
@@ -118,6 +131,8 @@ const addPost = new WizardScene('add-post',
                     [Markup.callbackButton(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]
                 ]))
         )
+
+
         return wizard.next()
     },
 
@@ -182,6 +197,17 @@ const addPost = new WizardScene('add-post',
                 .markup(Markup.removeKeyboard(true))
         )
 
+        // await telegram.sendMessage(
+        //     data.chatId,
+        //     i18n.t(
+        //         'newPost', {
+        //             category: session.category,
+        //             description: session.description,
+        //             price: session.price,
+        //         }
+        //     )
+        // )
+
         await telegram.sendMediaGroup(
             data.chatId, session.image.map((img, index) => {
                 if (index === 0) {
@@ -210,5 +236,3 @@ const addPost = new WizardScene('add-post',
 )
 
 module.exports = addPost
-
-// Категория: #${session.category} \n\nОписание: ${session.description} \n\nЦена: ${session.price}
