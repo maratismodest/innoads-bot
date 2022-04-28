@@ -24,11 +24,14 @@ const addPost = new WizardScene('add-post',
     },
     //Description
     async (ctx) => {
-        const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message} = ctx
+        const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message, scene} = ctx
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
+        }
+        if (message && message.text == '/start') {
+            return scene.enter('add-post')
         }
         const buttons = session.buttons
         if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
