@@ -30,9 +30,11 @@ const addPost = new WizardScene('add-post',
                 reply_markup: {remove_keyboard: true},
             })
         }
+
         if (message && message.text == '/start') {
             return scene.enter('add-post')
         }
+        
         const buttons = session.buttons
         if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
             return
