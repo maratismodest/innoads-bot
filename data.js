@@ -4,6 +4,6 @@ const ReleaseToken = '5142455295:AAEVfMbX6K03WGB7fse_Mpqr8V80uQQA1IE'
 const testChat = '@innoadsstage'
 const releaseChat = '@innoads'
 module.exports = {
-    token: ProdToken,
+    token: StageToken,
     chatId: testChat
 }
