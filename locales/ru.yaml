@@ -22,6 +22,7 @@ buttons:
   sendNumber: '📱 Отправить телефон'
   sendLocation: '📍 Отправить локацию'
   addPost: '🪧 Подать объявление'
+  site: 'InnoAds'
   next: 'Далее'
   back: 'Назад'
   photo:
