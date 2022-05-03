@@ -8,6 +8,6 @@ const GitToken = '5313737775:AAGQz6DY-7voZKd17s-PM6HZzGUhJHmuoIc'
 const testChat = '@innoadsstage'
 const prodChat = '@innoads'
 module.exports = {
-    token: ProdToken,
-    chatId: prodChat
+    token: StageToken,
+    chatId: testChat
 }
