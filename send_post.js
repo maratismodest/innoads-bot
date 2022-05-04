@@ -4,15 +4,14 @@ const Extra = require('telegraf/extra')
 const data = require('./data')
 const axios = require('axios')
 const {storageModule} = require("./firebaseConfig");
-const buffer = require("node:buffer")
-const {chatId} = require("./data");
+
 const slug = require("slug");
 
 const sendPost = new WizardScene('send-post',
     //Category
     (ctx) => {
         const {wizard, i18n, replyWithHTML, session} = ctx;
-        const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service')]
+        const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
         session.image = []
         session.buttons = buttons
         replyWithHTML(
@@ -21,7 +20,8 @@ const sendPost = new WizardScene('send-post',
                 .markup(Markup.inlineKeyboard([
                     [Markup.callbackButton(buttons[0], buttons[0])],
                     [Markup.callbackButton(buttons[1], buttons[1])],
-                    [Markup.callbackButton(buttons[2], buttons[2])]
+                    [Markup.callbackButton(buttons[2], buttons[2])],
+                    [Markup.callbackButton(buttons[3], buttons[3])]
                 ]))
         )
         return wizard.next()
@@ -85,6 +85,9 @@ const sendPost = new WizardScene('send-post',
         }
 
         if (!message.text) {
+            return replyWithHTML(i18n.t('price'))
+        }
+        if (isNaN(+message.text)) {
             return replyWithHTML(i18n.t('price'))
         }
         session.price = message.text
@@ -218,7 +221,7 @@ const sendPost = new WizardScene('send-post',
             return res;
         }));
 
-        const title = session.description.substring(0, 10)
+        const title = session.description.substring(0, 20)
         const slugTitle = slug(title) + "-" + Math.floor(Math.random() * 100)
 
         const formData = {
@@ -263,7 +266,8 @@ const getLink = async (file_id) => {
 const options = [
     {value: 1, label: "Продам"},
     {value: 2, label: "Куплю"},
-    {value: 3, label: "Услуги"}
+    {value: 3, label: "Услуги"},
+    {value: 4, label: "Вакансии"},
 ];
 
 // Категория: #${session.category} \n\nОписание: ${session.description} \n\nЦена: ${session.price}

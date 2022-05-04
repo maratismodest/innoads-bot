@@ -30,7 +30,7 @@ bot.start(({i18n, replyWithHTML}) => {
         i18n.t('welcome'),
         Extra
             .markup(Markup.keyboard([
-                [i18n.t('buttons.addPost'), i18n.t('buttons.site')]
+                [i18n.t('buttons.addPost')]
             ]).resize().oneTime())
     )
 })
@@ -40,11 +40,11 @@ bot.hears(TelegrafI18n.match('buttons.contacts'), ({i18n, replyWithHTML}) => {
 })
 
 bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
-    ctx.scene.enter('add-post')
-})
-
-bot.hears(TelegrafI18n.match('buttons.site'), (ctx) => {
     ctx.scene.enter('send-post')
 })
+
+// bot.hears(TelegrafI18n.match('buttons.site'), (ctx) => {
+//     ctx.scene.enter('send-post')
+// })
 
 bot.launch()
