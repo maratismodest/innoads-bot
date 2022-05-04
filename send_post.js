@@ -245,6 +245,14 @@ const sendPost = new WizardScene('send-post',
 
         await axios.post(`${data.backend}/post`, formData)
 
+        return replyWithHTML(
+            i18n.t('welcome'),
+            Extra
+                .markup(Markup.keyboard([
+                    [i18n.t('buttons.addPost'),i18n.t('links.innoads')]
+                ]).resize().oneTime())
+        )
+
         scene.leave()
     }
 )

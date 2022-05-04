@@ -30,7 +30,7 @@ bot.start(({i18n, replyWithHTML}) => {
         i18n.t('welcome'),
         Extra
             .markup(Markup.keyboard([
-                [i18n.t('buttons.addPost')]
+                [i18n.t('buttons.addPost'), i18n.t('links.innoads')]
             ]).resize().oneTime())
     )
 })
@@ -41,6 +41,16 @@ bot.hears(TelegrafI18n.match('buttons.contacts'), ({i18n, replyWithHTML}) => {
 
 bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
     ctx.scene.enter('send-post')
+})
+bot.hears(TelegrafI18n.match('links.innoads'), ({i18n, replyWithHTML,}) => {
+    // ctx.scene.enter('send-post')
+    replyWithHTML(
+        i18n.t('category'),
+        Extra
+            .markup(Markup.inlineKeyboard([
+                [Markup.urlButton(i18n.t('links.innoads'), 'https://t.me/innoads')],
+            ]))
+    )
 })
 
 // bot.hears(TelegrafI18n.match('buttons.site'), (ctx) => {
