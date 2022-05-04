@@ -1,3 +1,5 @@
+// @InnoAdsHelpBot
+const ReleaseToken='5142455295:AAEVfMbX6K03WGB7fse_Mpqr8V80uQQA1IE'
 // @InnoAdsPostBot
 const ProdToken = '5142455295:AAEVfMbX6K03WGB7fse_Mpqr8V80uQQA1IE'
 // @InnoAdsStageBot
@@ -9,8 +11,9 @@ const backend = 'https://innoads-backend-two.herokuapp.com'
 
 const testChat = '@innoadsstage'
 const prodChat = '@innoads'
+const releaseChat = '@innoads'
 module.exports = {
-    token: GitToken,
-    chatId: testChat,
+    token: ReleaseToken,
+    chatId: releaseChat,
     backend: backend
 }
