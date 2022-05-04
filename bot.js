@@ -18,7 +18,7 @@ const i18n = new TelegrafI18n({
 
 const bot = new Telegraf(data.token)
 const stage = new Stage()
-stage.register(addPost)
+// stage.register(addPost)
 stage.register(sendPost)
 
 bot.use(i18n.middleware())

@@ -32,10 +32,9 @@ buttons:
     stop: '⏹️Завершить загрузку картинок'
 
 categories:
-  sell: 'sell'
-  buy: 'buy'
-  rent: 'rent'
-  service: 'service'
+  sell: 'Sell'
+  buy: 'Buy'
+  service: 'Service'
 
 #categories:
 #  sell: '🪅 sell'
