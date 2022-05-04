@@ -10,7 +10,10 @@ const slug = require("slug");
 const sendPost = new WizardScene('send-post',
     //Category
     (ctx) => {
-        const {wizard, i18n, replyWithHTML, session} = ctx;
+        const {wizard, i18n, replyWithHTML, session, chat} = ctx;
+        if (!chat.username) {
+            return replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
+        }
         const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
         session.image = []
         session.buttons = buttons
