@@ -35,6 +35,9 @@ categories:
   service: 'Услуги'
   vacation: 'Вакансии'
 
+links:
+  innoads: '🏪 перейти в InnoAds'
+
 #categories:
 #  sell: '🪅 продам'
 #  buy: '🎈 куплю'
