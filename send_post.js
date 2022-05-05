@@ -6,14 +6,36 @@ const axios = require('axios')
 const {storageModule} = require("./firebaseConfig");
 
 const slug = require("slug");
+const {Tg} = require("./models/models");
+
+const postUser = async (req) => {
+    let {first_name, id, last_name, username} =
+        req;
+    const [user, created] = await Tg.findOrCreate({
+        where: {id: id},
+        defaults: {
+            ...req,
+        },
+    });
+    if (user.id == id) {
+        await Tg.update({first_name, last_name, username}, {where: {id: id}});
+    }
+}
 
 const sendPost = new WizardScene('send-post',
     //Category
-    (ctx) => {
-        const {wizard, i18n, replyWithHTML, session, chat} = ctx;
+    async (ctx) => {
+
+        const {wizard, i18n, replyWithHTML, session, chat, message, scene} = ctx;
+        if (message && message.text == '/start') {
+            return scene.enter('send-post')
+        }
+
+
         if (!chat.username) {
             return replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
+        await postUser(chat)
         const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
         session.image = []
         session.buttons = buttons
@@ -41,6 +63,10 @@ const sendPost = new WizardScene('send-post',
         if (message && message.text == '/start') {
             return scene.enter('send-post')
         }
+        if (message && message.text == i18n.t('buttons.addPost')){
+            return scene.enter('send-post')
+        }
+
 
         const buttons = session.buttons
         if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
@@ -48,8 +74,7 @@ const sendPost = new WizardScene('send-post',
         }
         session.category = callbackQuery.data
         replyWithHTML(
-            `Категория: #${session.category} \n${i18n.t('description')}`, Extra
-                .markup(Markup.removeKeyboard(true))
+            `Категория: #${session.category} \n${i18n.t('description')}`
         )
         return wizard.next()
     },
@@ -58,6 +83,10 @@ const sendPost = new WizardScene('send-post',
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
         if (message && message.text == '/start') {
+            return scene.enter('send-post')
+        }
+
+        if (message && message.text == i18n.t('buttons.addPost')){
             return scene.enter('send-post')
         }
 
@@ -70,8 +99,7 @@ const sendPost = new WizardScene('send-post',
         }
         session.description = message.text
         replyWithHTML(
-            i18n.t('price'), Extra
-                .markup(Markup.removeKeyboard(true))
+            i18n.t('price')
         )
         return wizard.next()
     },
@@ -80,6 +108,9 @@ const sendPost = new WizardScene('send-post',
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
         if (message.text == '/start') {
+            return scene.enter('send-post')
+        }
+        if (message && message.text == i18n.t('buttons.addPost')){
             return scene.enter('send-post')
         }
 
@@ -95,8 +126,7 @@ const sendPost = new WizardScene('send-post',
         }
         session.price = message.text
         replyWithHTML(
-            i18n.t('image'), Extra
-                .markup(Markup.removeKeyboard(true))
+            i18n.t('image')
         )
 
         return wizard.next()
@@ -110,6 +140,9 @@ const sendPost = new WizardScene('send-post',
             })
         }
         if (message.text == '/start') {
+            return scene.enter('send-post')
+        }
+        if (message && message.text == i18n.t('buttons.addPost')){
             return scene.enter('send-post')
         }
         if (message.media_group_id) {
@@ -149,6 +182,10 @@ const sendPost = new WizardScene('send-post',
             return scene.enter('send-post')
         }
 
+        if (message && message.text == i18n.t('buttons.addPost')){
+            return scene.enter('send-post')
+        }
+
         if (callbackQuery.data === i18n.t('buttons.photo.add')) {
             replyWithHTML(i18n.t('image')), Extra
                 .markup(Markup.removeKeyboard(true))
@@ -177,25 +214,19 @@ const sendPost = new WizardScene('send-post',
             editMessageReplyMarkup,
             chat
         } = ctx
-        // console.log("chat",chat)
+
         await editMessageReplyMarkup({
             reply_markup: {remove_keyboard: true},
         })
+
         const cb = callbackQuery.data
         // console.log("CB", cb)
         if (cb === i18n.t('no')) {
             replyWithHTML(
-                'Объявление не опубликовано',
-                Extra
-                    .markup(Markup.removeKeyboard(true))
+                'Объявление не опубликовано'
             )
             return scene.leave()
         }
-        replyWithHTML(
-            i18n.t('thanks'),
-            Extra
-                .markup(Markup.removeKeyboard(true))
-        )
 
         await telegram.sendMediaGroup(
             data.chatId, session.image.map((img, index) => {
@@ -239,11 +270,11 @@ const sendPost = new WizardScene('send-post',
             categoryId: options.find(x => x.label == session.category).value
         }
 
-
-        // console.log('asyncRes', asyncRes)
-
-
         await axios.post(`${data.backend}/post`, formData)
+
+        replyWithHTML(
+            i18n.t('thanks')
+        )
 
         scene.leave()
     }
