@@ -3,39 +3,22 @@ const Markup = require('telegraf/markup')
 const Extra = require('telegraf/extra')
 const data = require('./data')
 const axios = require('axios')
-const {storageModule} = require("./firebaseConfig");
-
 const slug = require("slug");
-const {Tg} = require("./models/models");
+const {options} = require("./uitls/constants");
+const {getLink, postUser} = require("./uitls/functions");
 
-const postUser = async (req) => {
-    let {first_name, id, last_name, username} =
-        req;
-    const [user, created] = await Tg.findOrCreate({
-        where: {id: id},
-        defaults: {
-            ...req,
-        },
-    });
-    if (user.id == id) {
-        await Tg.update({first_name, last_name, username}, {where: {id: id}});
-    }
-}
-
-const sendPost = new WizardScene('send-post',
+const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
 
         const {wizard, i18n, replyWithHTML, session, chat, message, scene} = ctx;
         if (message && message.text == '/start') {
-            return scene.enter('send-post')
+            return scene.leave()
         }
-
 
         if (!chat.username) {
             return replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
-        await postUser(chat)
         const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
         session.image = []
         session.buttons = buttons
@@ -61,9 +44,9 @@ const sendPost = new WizardScene('send-post',
         }
 
         if (message && message.text == '/start') {
-            return scene.enter('send-post')
+            return scene.leave()
         }
-        if (message && message.text == i18n.t('buttons.addPost')){
+        if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
 
@@ -82,11 +65,12 @@ const sendPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
+
         if (message && message.text == '/start') {
-            return scene.enter('send-post')
+            return scene.leave()
         }
 
-        if (message && message.text == i18n.t('buttons.addPost')){
+        if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
 
@@ -107,10 +91,11 @@ const sendPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-        if (message.text == '/start') {
-            return scene.enter('send-post')
+
+        if (message && message.text == '/start') {
+            return scene.leave()
         }
-        if (message && message.text == i18n.t('buttons.addPost')){
+        if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
 
@@ -139,10 +124,11 @@ const sendPost = new WizardScene('send-post',
                 reply_markup: {remove_keyboard: true},
             })
         }
-        if (message.text == '/start') {
-            return scene.enter('send-post')
+
+        if (message && message.text == '/start') {
+            return scene.leave()
         }
-        if (message && message.text == i18n.t('buttons.addPost')){
+        if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
         if (message.media_group_id) {
@@ -178,11 +164,12 @@ const sendPost = new WizardScene('send-post',
             })
         }
 
+
         if (message && message.text == '/start') {
-            return scene.enter('send-post')
+            return scene.leave()
         }
 
-        if (message && message.text == i18n.t('buttons.addPost')){
+        if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
 
@@ -227,6 +214,8 @@ const sendPost = new WizardScene('send-post',
             )
             return scene.leave()
         }
+
+        await postUser(chat)
 
         await telegram.sendMediaGroup(
             data.chatId, session.image.map((img, index) => {
@@ -280,28 +269,6 @@ const sendPost = new WizardScene('send-post',
     }
 )
 
-module.exports = sendPost
-
-const getLink = async (file_id) => {
-    try {
-        const res = await axios.get(`https://api.telegram.org/bot${data.token}/getFile?file_id=${file_id}`)
-        const aLink = `https://api.telegram.org/file/bot${data.token}/${res.data.result.file_path}`
-        const response = await axios.get(aLink, {responseType: 'arraybuffer'})
-        const image = storageModule.ref().child((+new Date()).toString());
-        await image.put(response.data);
-        const imageLink = await image.getDownloadURL();
-        // console.log('imageLink', imageLink)
-        return imageLink
-    } catch (e) {
-        console.log(e)
-    }
-}
-
-const options = [
-    {value: 1, label: "Продам"},
-    {value: 2, label: "Куплю"},
-    {value: 3, label: "Услуги"},
-    {value: 4, label: "Вакансии"},
-];
+module.exports = addPost
 
 // Категория: #${session.category} \n\nОписание: ${session.description} \n\nЦена: ${session.price}
