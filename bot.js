@@ -25,7 +25,7 @@ bot.use(i18n.middleware())
 bot.use(session())
 bot.use(stage.middleware())
 
-bot.start(async ({i18n, replyWithHTML}) => {
+bot.start(async ({i18n, replyWithHTML, scene}) => {
     await sequelize.authenticate();
     await sequelize.sync()
     return replyWithHTML(
@@ -41,8 +41,9 @@ bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
     ctx.scene.enter('send-post')
 })
 
-// bot.hears(TelegrafI18n.match('/start'), (ctx) => {
-//
-// })
+bot.hears(('/about'), ({i18n, replyWithHTML}) => {
+    return replyWithHTML(
+        i18n.t('about'))
+})
 
 bot.launch()

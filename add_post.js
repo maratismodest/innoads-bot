@@ -13,7 +13,14 @@ const addPost = new WizardScene('send-post',
 
         const {wizard, i18n, replyWithHTML, session, chat, message, scene} = ctx;
         if (message && message.text == '/start') {
-            return scene.leave()
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
         }
 
         if (!chat.username) {
@@ -37,15 +44,23 @@ const addPost = new WizardScene('send-post',
     //Description
     async (ctx) => {
         const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message, scene} = ctx
+        if (message && message.text == '/start') {
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
+        }
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
         }
 
-        if (message && message.text == '/start') {
-            return scene.leave()
-        }
+
         if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
@@ -67,7 +82,14 @@ const addPost = new WizardScene('send-post',
 
 
         if (message && message.text == '/start') {
-            return scene.leave()
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
         }
 
         if (message && message.text == i18n.t('buttons.addPost')) {
@@ -93,7 +115,14 @@ const addPost = new WizardScene('send-post',
 
 
         if (message && message.text == '/start') {
-            return scene.leave()
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
         }
         if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
@@ -119,15 +148,24 @@ const addPost = new WizardScene('send-post',
 
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, editMessageReplyMarkup} = ctx
+
+        if (message && message.text == '/start') {
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
+        }
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
         }
 
-        if (message && message.text == '/start') {
-            return scene.leave()
-        }
+
         if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
         }
@@ -158,16 +196,24 @@ const addPost = new WizardScene('send-post',
     //Add More Photo
     async (ctx) => {
         const {wizard, scene, message, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup} = ctx
+
+        if (message && message.text == '/start') {
+            scene.leave()
+            return replyWithHTML(
+                i18n.t('welcome'),
+                Extra
+                    .markup(Markup.keyboard([
+                        [i18n.t('buttons.addPost')]
+                    ]).resize())
+            )
+        }
+
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
         }
 
-
-        if (message && message.text == '/start') {
-            return scene.leave()
-        }
 
         if (message && message.text == i18n.t('buttons.addPost')) {
             return scene.enter('send-post')
@@ -262,7 +308,11 @@ const addPost = new WizardScene('send-post',
         await axios.post(`${data.backend}/post`, formData)
 
         replyWithHTML(
-            i18n.t('thanks')
+            i18n.t('thanks'),
+            Extra
+                .markup(Markup.inlineKeyboard([
+                    [Markup.urlButton(i18n.t('goToChannel'), 'https://t.me/innoads')],
+                ]))
         )
 
         scene.leave()
