@@ -150,6 +150,8 @@ const addPost = new WizardScene('send-post',
         // console.log('message', message.photo)
         const getPhoto = message.photo.find(x => (x.width < 600) && (x.width > 400)) || message.photo[message.photo.length - 1]
         // const currentImage = message.photo[message.photo.length - 1].file_id
+
+        // console.log('getPhoto',getPhoto)
         session.image = [...session.image, getPhoto.file_id]
 
         replyWithHTML(
