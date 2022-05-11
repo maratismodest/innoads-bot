@@ -58,7 +58,7 @@ const addPost = new WizardScene('send-post',
         )
         return wizard.next()
     },
-    //Description
+    //Title
     async (ctx) => {
         const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message, scene} = ctx
         handleStart(ctx)
@@ -78,7 +78,23 @@ const addPost = new WizardScene('send-post',
 
         session.category = callbackQuery.data
         replyWithHTML(
-            `Категория: #${session.category} \n${i18n.t('description')}`
+            `Категория: #${session.category} \n${i18n.t('title')}`
+        )
+        return wizard.next()
+    },
+    //Description
+    async (ctx) => {
+        const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message, scene} = ctx
+        handleStart(ctx)
+        handleSend(ctx)
+
+        if (!message.text) {
+            return replyWithHTML(i18n.t('title'))
+        }
+
+        session.title = message.text
+        replyWithHTML(
+            `${i18n.t('description')}`
         )
         return wizard.next()
     },
@@ -102,7 +118,7 @@ const addPost = new WizardScene('send-post',
         )
         return wizard.next()
     },
-    //Description
+    //Image
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
@@ -150,8 +166,6 @@ const addPost = new WizardScene('send-post',
         // console.log('message', message.photo)
         const getPhoto = message.photo.find(x => (x.width < 600) && (x.width > 400)) || message.photo[message.photo.length - 1]
         // const currentImage = message.photo[message.photo.length - 1].file_id
-
-        // console.log('getPhoto',getPhoto)
         session.image = [...session.image, getPhoto.file_id]
 
         replyWithHTML(
@@ -307,8 +321,7 @@ const addPost = new WizardScene('send-post',
         }
 
         await axios.post(`${data.backend}/post`, formData)
-
-
+        
         scene.leave()
     }
 )
