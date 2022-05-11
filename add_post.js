@@ -7,28 +7,44 @@ const slug = require("slug");
 const {options} = require("./uitls/constants");
 const {getLink, postUser} = require("./uitls/functions");
 
+const PHOTO_LIMIT_COUNT = 4;
+const START = '/start'
+
+const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
+
+const handleStart = (ctx) => {
+    const {message, scene, i18n, replyWithHTML} = ctx
+    if (message && message.text == START) {
+        scene.leave()
+        return replyWithHTML(
+            i18n.t('welcome'),
+            Extra
+                .markup(Markup.keyboard([
+                    [i18n.t('buttons.addPost')]
+                ]).resize())
+        )
+    }
+}
+const handleSend = (ctx) => {
+    const {message, i18n, scene} = ctx;
+
+    if (message && message.text == i18n.t('buttons.addPost')) {
+        return scene.enter('send-post')
+    }
+}
+
 const addPost = new WizardScene('send-post',
     //Category
-    async (ctx) => {
-
-        const {wizard, i18n, replyWithHTML, session, chat, message, scene} = ctx;
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
-
+    (ctx) => {
+        const {wizard, i18n, replyWithHTML, session, chat, message} = ctx;
+        handleStart(ctx)
         if (!chat.username) {
             return replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
-        const buttons = [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
         session.image = []
+        const buttons = getButtons(i18n)
         session.buttons = buttons
+
         replyWithHTML(
             i18n.t('category'),
             Extra
@@ -44,32 +60,21 @@ const addPost = new WizardScene('send-post',
     //Description
     async (ctx) => {
         const {wizard, session, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, message, scene} = ctx
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
+        handleStart(ctx)
+        handleSend(ctx)
+
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
         }
 
-
-        if (message && message.text == i18n.t('buttons.addPost')) {
-            return scene.enter('send-post')
-        }
-
-
         const buttons = session.buttons
-        if (!callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
-            return
+
+        if (message || !callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
+            return ctx.reply('Внимание: выберите одну из категорий!')
         }
+
         session.category = callbackQuery.data
         replyWithHTML(
             `Категория: #${session.category} \n${i18n.t('description')}`
@@ -80,21 +85,8 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
-
-        if (message && message.text == i18n.t('buttons.addPost')) {
-            return scene.enter('send-post')
-        }
+        handleStart(ctx)
+        handleSend(ctx)
 
         if (+chat.id < 0) {
             return
@@ -113,31 +105,17 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
-        if (message && message.text == i18n.t('buttons.addPost')) {
-            return scene.enter('send-post')
-        }
+        handleStart(ctx)
+        handleSend(ctx)
 
         if (+chat.id < 0) {
             return
         }
 
-        if (!message.text) {
+        if (!message.text || isNaN(+message.text)) {
             return replyWithHTML(i18n.t('price'))
         }
-        if (isNaN(+message.text)) {
-            return replyWithHTML(i18n.t('price'))
-        }
+
         session.price = message.text
         replyWithHTML(
             i18n.t('image')
@@ -149,26 +127,15 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, editMessageReplyMarkup} = ctx
 
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
+        handleStart(ctx)
+        handleSend(ctx)
+
         if (!message) {
             await editMessageReplyMarkup({
                 reply_markup: {remove_keyboard: true},
             })
         }
 
-
-        if (message && message.text == i18n.t('buttons.addPost')) {
-            return scene.enter('send-post')
-        }
         if (message.media_group_id) {
             if (session.media_group_id && session.media_group_id === message.media_group_id) {
                 return
@@ -177,7 +144,7 @@ const addPost = new WizardScene('send-post',
             return replyWithHTML('Добавлять можно только по одной фотографии. Добавьте фотографию')
         }
         if (!message.photo || !message.photo.length || message.photo.length === 0) {
-            return
+            return replyWithHTML('Что-то пошло не так. Попробуйте еще раз добавить изображение')
         }
         const currentImage = message.photo[message.photo.length - 1].file_id
         session.image = [...session.image, currentImage]
@@ -195,18 +162,10 @@ const addPost = new WizardScene('send-post',
 
     //Add More Photo
     async (ctx) => {
-        const {wizard, scene, message, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup} = ctx
+        const {wizard, scene, message, i18n, replyWithHTML, callbackQuery, editMessageReplyMarkup, session} = ctx
 
-        if (message && message.text == '/start') {
-            scene.leave()
-            return replyWithHTML(
-                i18n.t('welcome'),
-                Extra
-                    .markup(Markup.keyboard([
-                        [i18n.t('buttons.addPost')]
-                    ]).resize())
-            )
-        }
+        handleStart(ctx)
+        handleSend(ctx)
 
         if (!message) {
             await editMessageReplyMarkup({
@@ -214,9 +173,25 @@ const addPost = new WizardScene('send-post',
             })
         }
 
+        if (message) {
+            await editMessageReplyMarkup({
+                reply_markup: {remove_keyboard: true},
+            })
+        }
 
-        if (message && message.text == i18n.t('buttons.addPost')) {
-            return scene.enter('send-post')
+        if (session.image.length === PHOTO_LIMIT_COUNT) {
+            replyWithHTML(
+                'Лимит фото достигнут'
+            )
+            replyWithHTML(
+                i18n.t('confirm') + '?',
+                Extra
+                    .markup(Markup.inlineKeyboard([
+                        [Markup.callbackButton(i18n.t('yes'), i18n.t('yes'))],
+                        [Markup.callbackButton(i18n.t('no'), i18n.t('no'))]
+                    ]))
+            )
+            return wizard.next()
         }
 
         if (callbackQuery.data === i18n.t('buttons.photo.add')) {
@@ -224,6 +199,7 @@ const addPost = new WizardScene('send-post',
                 .markup(Markup.removeKeyboard(true))
             return wizard.back()
         }
+
         replyWithHTML(
             i18n.t('confirm') + '?',
             Extra
@@ -248,6 +224,17 @@ const addPost = new WizardScene('send-post',
             chat
         } = ctx
 
+        handleStart(ctx)
+
+        if (message) {
+            return replyWithHTML(
+                i18n.t('confirm') + '?',
+                Extra
+                    .markup(Markup.inlineKeyboard([
+                        [Markup.callbackButton(i18n.t('yes'), i18n.t('yes'))],
+                        [Markup.callbackButton(i18n.t('no'), i18n.t('no'))]
+                    ])))
+        }
         await editMessageReplyMarkup({
             reply_markup: {remove_keyboard: true},
         })
@@ -285,6 +272,15 @@ const addPost = new WizardScene('send-post',
                 }
             })
         )
+
+        replyWithHTML(
+            i18n.t('thanks'),
+            Extra
+                .markup(Markup.inlineKeyboard([
+                    [Markup.urlButton(i18n.t('goToChannel'), 'https://t.me/innoads')],
+                ]))
+        )
+
         const asyncRes = await Promise.all(session.image.map(async (file_id) => {
             const res = await getLink(file_id)
             return res;
@@ -307,13 +303,6 @@ const addPost = new WizardScene('send-post',
 
         await axios.post(`${data.backend}/post`, formData)
 
-        replyWithHTML(
-            i18n.t('thanks'),
-            Extra
-                .markup(Markup.inlineKeyboard([
-                    [Markup.urlButton(i18n.t('goToChannel'), 'https://t.me/innoads')],
-                ]))
-        )
 
         scene.leave()
     }
