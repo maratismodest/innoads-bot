@@ -164,7 +164,8 @@ const addPost = new WizardScene('send-post',
             return replyWithHTML('Что-то пошло не так. Попробуйте еще раз добавить изображение')
         }
         // console.log('message', message.photo)
-        const getPhoto = message.photo.find(x => (x.width < 600) && (x.width > 400)) || message.photo[message.photo.length - 1]
+        const getPhoto = message.photo.find(x => ((x.width <= 800) && (x.width >= 400))) || message.photo[message.photo.length - 1]
+        // console.log('getPhoto', getPhoto)
         // const currentImage = message.photo[message.photo.length - 1].file_id
         session.image = [...session.image, getPhoto.file_id]
 
@@ -321,7 +322,7 @@ const addPost = new WizardScene('send-post',
         }
 
         await axios.post(`${data.backend}/post`, formData)
-        
+
         scene.leave()
     }
 )
