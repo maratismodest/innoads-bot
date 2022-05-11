@@ -38,6 +38,7 @@ categories:
   buy: 'Buy'
   service: 'Service'
   vacation: 'Vacations'
+  estate: 'Estate'
 
 links:
   innoads: '🏪 перейти в InnoAds'
