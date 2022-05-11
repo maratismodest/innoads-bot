@@ -10,7 +10,7 @@ const {getLink, postUser} = require("./uitls/functions");
 const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'
 
-const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
+const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
 
 const handleStart = (ctx) => {
     const {message, scene, i18n, replyWithHTML} = ctx
@@ -52,7 +52,8 @@ const addPost = new WizardScene('send-post',
                     [Markup.callbackButton(buttons[0], buttons[0])],
                     [Markup.callbackButton(buttons[1], buttons[1])],
                     [Markup.callbackButton(buttons[2], buttons[2])],
-                    [Markup.callbackButton(buttons[3], buttons[3])]
+                    [Markup.callbackButton(buttons[3], buttons[3])],
+                    [Markup.callbackButton(buttons[4], buttons[4])]
                 ]))
         )
         return wizard.next()
