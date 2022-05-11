@@ -278,6 +278,7 @@ const addPost = new WizardScene('send-post',
                         "caption": i18n.t(
                             'newPost', {
                                 category: session.category,
+                                title: session.title,
                                 description: session.description,
                                 price: session.price,
                                 alias: chat.username
@@ -305,11 +306,10 @@ const addPost = new WizardScene('send-post',
             return res;
         }));
 
-        const title = session.description.substring(0, 20)
-        const slugTitle = slug(title) + "-" + Math.floor(Math.random() * 100)
+        const slugTitle = slug(session.title) + "-" + Math.floor(Math.random() * 100)
 
         const formData = {
-            title: title,
+            title: session.title,
             body: session.description,
             price: session.price,
             preview: asyncRes[0],

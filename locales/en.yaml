@@ -7,7 +7,7 @@ getNumber: 'Press "📱 Send number" or type it in the international format +798
 getLocation: 'Press "📍 Send location" button'
 thanks: 'Опубликовано!'
 newUser: 'New user: \n\nName: ${name} \nNumber: ${number}'
-newPost: 'New post \n\nкатегория: ${category} \nцена: ${price} \n\n${description} \n\n👤автор: @${alias}'
+newPost: 'категория: #${category} \nцена: ${price} \n\n${title} \n${description} \n\n👤автор: @${alias}'
 requestLocation: '📍 Get location'
 category: '✍🏻 Публикация объявления \n\n Выберите категорию:'
 title: 'Введите заголовок объявления'
