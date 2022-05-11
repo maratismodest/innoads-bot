@@ -147,8 +147,12 @@ const addPost = new WizardScene('send-post',
         if (!message.photo || !message.photo.length || message.photo.length === 0) {
             return replyWithHTML('Что-то пошло не так. Попробуйте еще раз добавить изображение')
         }
-        const currentImage = message.photo[message.photo.length - 1].file_id
-        session.image = [...session.image, currentImage]
+        // console.log('message', message.photo)
+        const getPhoto = message.photo.find(x => (x.width < 600) && (x.width > 400)) || message.photo[message.photo.length - 1]
+        // const currentImage = message.photo[message.photo.length - 1].file_id
+
+        // console.log('getPhoto',getPhoto)
+        session.image = [...session.image, getPhoto.file_id]
 
         replyWithHTML(
             i18n.t('buttons.photo.add') + '?',
