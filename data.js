@@ -7,7 +7,7 @@ const StageToken = '5322899789:AAFXwBt5zjbfUU6J9KGVKKBNr-4bsUkeNkQ'
 // @InnoAdsGitBot
 const GitToken = '5313737775:AAGQz6DY-7voZKd17s-PM6HZzGUhJHmuoIc'
 
-const backend = 'https://innoads-backend-two.herokuapp.com'
+const backend = 'https://innoads-backend.herokuapp.com'
 
 const testChat = '@innoadsstage'
 const prodChat = '@innoads'
