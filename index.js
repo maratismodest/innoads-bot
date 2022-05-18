@@ -15,7 +15,7 @@ const i18n = new TelegrafI18n({
     locale: 'ru'
 })
 
-const bot = new Telegraf(process.env.BOT_TOKEN_TEST)
+const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)

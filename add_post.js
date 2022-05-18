@@ -276,7 +276,7 @@ const addPost = new WizardScene('send-post',
         await postUser(ctx.chat)
 
         await telegram.sendMediaGroup(
-            process.env.CHAT_TEST, session.image.map((img, index) => {
+            process.env.BOT_CHAT, session.image.map((img, index) => {
                 if (index === 0) {
                     return {
                         "type": "photo",
@@ -325,7 +325,7 @@ const addPost = new WizardScene('send-post',
             categoryId: options.find(x => x.label == session.category).value
         }
 
-        await axios.post(`${process.env.BACKEND}/post`, formData)
+        await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
         await scene.leave()
     }
 )
