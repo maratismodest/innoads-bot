@@ -4,8 +4,8 @@ const {storageModule} = require("../firebaseConfig");
 const {Tg} = require("../models/models");
 const getLink = async (file_id) => {
     try {
-        const res = await axios.get(`https://api.telegram.org/bot${data.token}/getFile?file_id=${file_id}`)
-        const aLink = `https://api.telegram.org/file/bot${data.token}/${res.data.result.file_path}`
+        const res = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN_TEST}/getFile?file_id=${file_id}`)
+        const aLink = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN_TEST}/${res.data.result.file_path}`
         const response = await axios.get(aLink, {responseType: 'arraybuffer'})
         const image = storageModule.ref().child((+new Date()).toString());
         await image.put(response.data);

@@ -1,6 +1,3 @@
-// const WizardScene = require('telegraf/scenes/wizard')
-// const Markup = require('telegraf/markup')
-// const Extra = require('telegraf/extra')
 const {Scenes, Markup} = require('telegraf');
 const {WizardScene} = Scenes
 const axios = require('axios')
@@ -151,17 +148,11 @@ const addPost = new WizardScene('send-post',
             session,
             message,
             i18n,
-            replyWithHTML,
         } = ctx
 
         handleStart(ctx)
         handleSend(ctx)
 
-        if (!message) {
-            await ctx.editMessageReplyMarkup({
-                reply_markup: {remove_keyboard: true}
-            })
-        }
         const {media_group_id, photo} = message
         if (media_group_id) {
             if (session.media_group_id && session.media_group_id === media_group_id) {
@@ -196,10 +187,15 @@ const addPost = new WizardScene('send-post',
         handleStart(ctx)
         handleSend(ctx)
 
-        if (message) {
-            await ctx.editMessageReplyMarkup({
-                reply_markup: {remove_keyboard: true},
-            })
+        if (message && message.text) {
+            return await ctx.replyWithHTML(
+                i18n.t('buttons.photo.add') + '?',
+                Markup.inlineKeyboard([
+                        [Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))],
+                        [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]
+                    ]
+                )
+            )
         }
 
         if (session.image.length === PHOTO_LIMIT_COUNT) {
@@ -217,15 +213,8 @@ const addPost = new WizardScene('send-post',
             return wizard.next()
         }
 
-        if (ctx.message.text || !callbackQuery.data) {
-            return await ctx.replyWithHTML(
-                i18n.t('buttons.photo.add') + '?',
-                Markup.inlineKeyboard([
-                        [Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))],
-                        [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]
-                    ]
-                )
-            )
+        if (message && message.text) {
+            return ctx.replyWithHTML('Что-то пошло не так!')
         }
 
 
@@ -337,7 +326,6 @@ const addPost = new WizardScene('send-post',
         }
 
         await axios.post(`${process.env.BACKEND}/post`, formData)
-
         await scene.leave()
     }
 )

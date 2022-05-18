@@ -2,14 +2,11 @@ require("dotenv").config();
 const {Telegraf, Scenes, Markup, session} = require('telegraf')
 const {Stage} = Scenes
 const path = require('path')
-// const session = require('telegraf/session')
-// const Stage = require('telegraf/stage')
-// const Extra = require('telegraf/extra')
-// const Markup = require('telegraf/markup')
 const addPost = require('./add_post')
 const TelegrafI18n = require('telegraf-i18n')
 const sequelize = require("./db");
-const contactDataWizard = require('./test')
+const {Tg} = require("./models/models");
+
 
 const i18n = new TelegrafI18n({
     defaultLanguage: 'ru',
@@ -22,8 +19,6 @@ const bot = new Telegraf(process.env.BOT_TOKEN_TEST)
 
 const stage = new Stage()
 stage.register(addPost)
-// stage.register(contactDataWizard)
-
 bot.use(i18n.middleware())
 bot.use(session())
 bot.use(stage.middleware())
@@ -47,6 +42,15 @@ bot.hears(('/about'), (ctx) => {
     const {i18n} = ctx
     return ctx.replyWithHTML(
         i18n.t('about'))
+})
+
+bot.hears(('/profile'), async (ctx) => {
+    const post = await Tg.findOne({
+        where: {
+            id: ctx.chat.id
+        }
+    });
+    return ctx.replyWithHTML(post.photo_url)
 })
 
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
