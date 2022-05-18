@@ -1,5 +1,4 @@
 const axios = require("axios");
-const data = require("../data");
 const {storageModule} = require("../firebaseConfig");
 const {Tg} = require("../models/models");
 const getLink = async (file_id) => {
