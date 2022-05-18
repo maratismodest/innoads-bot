@@ -4,6 +4,7 @@ const axios = require('axios')
 const slug = require("slug");
 const {options} = require("./uitls/constants");
 const {getLink, postUser} = require("./uitls/functions");
+// const data = require("./data");
 
 const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'
