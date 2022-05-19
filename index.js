@@ -15,36 +15,15 @@ const i18n = new TelegrafI18n({
     locale: 'ru'
 })
 
-const index = new Telegraf(process.env.BOT_TOKEN)
+const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)
-index.use(i18n.middleware())
-index.use(session())
-index.use(stage.middleware())
+bot.use(i18n.middleware())
+bot.use(session())
+bot.use(stage.middleware())
 
-const getInvoice = (id) => {
-    const invoice = {
-        chat_id: id, // Уникальный идентификатор целевого чата или имя пользователя целевого канала
-        provider_token: process.env.PROVIDER_TOKEN, // токен выданный через бот @SberbankPaymentBot
-        start_parameter: 'get_access', //Уникальный параметр глубинных ссылок. Если оставить поле пустым, переадресованные копии отправленного сообщения будут иметь кнопку «Оплатить», позволяющую нескольким пользователям производить оплату непосредственно из пересылаемого сообщения, используя один и тот же счет. Если не пусто, перенаправленные копии отправленного сообщения будут иметь кнопку URL с глубокой ссылкой на бота (вместо кнопки оплаты) со значением, используемым в качестве начального параметра.
-        title: 'InnoAds', // Название продукта, 1-32 символа
-        description: 'Доска объявлений города Иннополис', // Описание продукта, 1-255 знаков
-        currency: 'RUB', // Трехбуквенный код валюты ISO 4217
-        prices: [{label: 'Сумма', amount: 100 * 60}], // Разбивка цен, сериализованный список компонентов в формате JSON 100 копеек * 100 = 100 рублей
-        photo_url: 'https://innoads.ru/icons/icon-512x512.png', // URL фотографии товара для счета-фактуры. Это может быть фотография товара или рекламное изображение услуги. Людям больше нравится, когда они видят, за что платят.
-        photo_width: 512, // Ширина фото
-        photo_height: 512, // Длина фото
-        payload: { // Полезные данные счета-фактуры, определенные ботом, 1–128 байт. Это не будет отображаться пользователю, используйте его для своих внутренних процессов.
-            unique_id: `${id}_${Number(new Date())}`,
-            provider_token: process.env.PROVIDER_TOKEN
-        }
-    }
-
-    return invoice
-}
-
-index.start(async (ctx) => {
+bot.start(async (ctx) => {
     const {i18n} = ctx
     await sequelize.authenticate();
     await sequelize.sync()
@@ -55,26 +34,28 @@ index.start(async (ctx) => {
         ]).resize())
 })
 
-index.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
+bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
     return ctx.scene.enter('send-post')
 })
 
-index.hears('pay', (ctx) => {
-    return ctx.replyWithInvoice(getInvoice(ctx.from.id)) //  метод replyWithInvoice для выставления счета
+bot.hears('/donate', async (ctx) => {
+    const {i18n} = ctx
+    await ctx.replyWithPhoto('https://innoads.ru/icons/icon-256x256.png')
+    return ctx.replyWithHTML(
+        i18n.t('donate'),
+        Markup.inlineKeyboard([
+                [Markup.button.url(i18n.t('donateLink'), 'https://yoomoney.ru/to/41001729160222')],
+            ]
+        ))
 })
-index.on('pre_checkout_query', (ctx) => ctx.answerPreCheckoutQuery(true)) // ответ на предварительный запрос по оплате
 
-index.on('successful_payment', async (ctx, next) => { // ответ в случае положительной оплаты
-    await ctx.reply('SuccessfulPayment')
-})
-
-index.hears(('/about'), (ctx) => {
+bot.hears(('/about'), (ctx) => {
     const {i18n} = ctx
     return ctx.replyWithHTML(
         i18n.t('about'))
 })
 
-index.hears(('/profile'), async (ctx) => {
+bot.hears(('/profile'), async (ctx) => {
     const post = await Tg.findOne({
         where: {
             id: ctx.chat.id
@@ -83,6 +64,6 @@ index.hears(('/profile'), async (ctx) => {
     return ctx.replyWithHTML(post.photo_url)
 })
 
-index.hears('hi', (ctx) => ctx.reply('Hey there'))
+bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 
-index.launch()
+bot.launch()
