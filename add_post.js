@@ -248,6 +248,7 @@ const addPost = new WizardScene('send-post',
         } = ctx
 
         handleStart(ctx)
+        handleSend(ctx)
 
         if (message) {
             return replyWithHTML(

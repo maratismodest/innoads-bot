@@ -15,13 +15,13 @@ const i18n = new TelegrafI18n({
     locale: 'ru'
 })
 
-const bot = new Telegraf(process.env.BOT_TOKEN)
+const index = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)
-bot.use(i18n.middleware())
-bot.use(session())
-bot.use(stage.middleware())
+index.use(i18n.middleware())
+index.use(session())
+index.use(stage.middleware())
 
 const getInvoice = (id) => {
     const invoice = {
@@ -44,7 +44,7 @@ const getInvoice = (id) => {
     return invoice
 }
 
-bot.start(async (ctx) => {
+index.start(async (ctx) => {
     const {i18n} = ctx
     await sequelize.authenticate();
     await sequelize.sync()
@@ -55,26 +55,26 @@ bot.start(async (ctx) => {
         ]).resize())
 })
 
-bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
+index.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
     return ctx.scene.enter('send-post')
 })
 
-bot.hears('pay', (ctx) => {
+index.hears('pay', (ctx) => {
     return ctx.replyWithInvoice(getInvoice(ctx.from.id)) //  метод replyWithInvoice для выставления счета
 })
-bot.on('pre_checkout_query', (ctx) => ctx.answerPreCheckoutQuery(true)) // ответ на предварительный запрос по оплате
+index.on('pre_checkout_query', (ctx) => ctx.answerPreCheckoutQuery(true)) // ответ на предварительный запрос по оплате
 
-bot.on('successful_payment', async (ctx, next) => { // ответ в случае положительной оплаты
+index.on('successful_payment', async (ctx, next) => { // ответ в случае положительной оплаты
     await ctx.reply('SuccessfulPayment')
 })
 
-bot.hears(('/about'), (ctx) => {
+index.hears(('/about'), (ctx) => {
     const {i18n} = ctx
     return ctx.replyWithHTML(
         i18n.t('about'))
 })
 
-bot.hears(('/profile'), async (ctx) => {
+index.hears(('/profile'), async (ctx) => {
     const post = await Tg.findOne({
         where: {
             id: ctx.chat.id
@@ -83,6 +83,6 @@ bot.hears(('/profile'), async (ctx) => {
     return ctx.replyWithHTML(post.photo_url)
 })
 
-bot.hears('hi', (ctx) => ctx.reply('Hey there'))
+index.hears('hi', (ctx) => ctx.reply('Hey there'))
 
-bot.launch()
+index.launch()
