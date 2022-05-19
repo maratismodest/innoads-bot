@@ -33,8 +33,9 @@ const handleSend = (ctx) => {
 const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
-        const {wizard, i18n, session, chat: {username}, message} = ctx;
+        const {wizard, i18n, session, chat: {username}} = ctx;
         handleStart(ctx)
+        handleSend(ctx)
         if (!username) {
             return ctx.replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
