@@ -44,7 +44,7 @@ bot.hears('/donate', async (ctx) => {
     return ctx.replyWithHTML(
         i18n.t('donate'),
         Markup.inlineKeyboard([
-                [Markup.button.url(i18n.t('donateLink'), 'https://yoomoney.ru/to/41001729160222')],
+                [Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],
             ]
         ))
 })
