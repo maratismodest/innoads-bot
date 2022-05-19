@@ -11,31 +11,16 @@ const START = '/start'
 
 const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
 
-const handleStart = (ctx) => {
-    const {message, scene, i18n} = ctx
-    if (message && message.text == START) {
-        scene.leave()
-        return ctx.replyWithHTML(
-            i18n.t('welcome'),
-            Markup.keyboard([
-                [i18n.t('buttons.addPost')]
-            ]).resize())
-    }
-}
-const handleSend = (ctx) => {
-    const {message, i18n, scene} = ctx;
-
-    if (message && message.text == i18n.t('buttons.addPost')) {
-        return scene.enter('send-post')
-    }
-}
-
 const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
-        const {wizard, i18n, session, chat: {username}} = ctx;
-        handleStart(ctx)
-        handleSend(ctx)
+        const {wizard, i18n, session, chat: {username}, message} = ctx;
+
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
+
         if (!username) {
             return ctx.replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
@@ -57,9 +42,12 @@ const addPost = new WizardScene('send-post',
     },
     //Title
     async (ctx) => {
-        const {wizard, session, i18n, replyWithHTML, callbackQuery, message} = ctx
-        handleStart(ctx)
-        handleSend(ctx)
+        const {wizard, session, i18n, replyWithHTML, callbackQuery, message, scene} = ctx
+
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
 
         if (!message) {
             await ctx.editMessageReplyMarkup({
@@ -85,10 +73,15 @@ const addPost = new WizardScene('send-post',
             wizard,
             session,
             i18n,
-            message: {text},
+            message,
         } = ctx
-        handleStart(ctx)
-        handleSend(ctx)
+
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
+
+        const {text} = message
 
         if (!text) {
             return await ctx.replyWithHTML(i18n.t('title'))
@@ -102,15 +95,19 @@ const addPost = new WizardScene('send-post',
     },
     //Price
     async (ctx) => {
-        const {wizard, session, message: {text}, i18n, chat} = ctx
+        const {wizard, session, message, i18n, chat} = ctx
 
-        handleStart(ctx)
-        handleSend(ctx)
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
+
 
         if (+chat.id < 0) {
             return
         }
 
+        const {text} = message
         if (!text) {
             return await ctx.replyWithHTML(i18n.t('description'))
         }
@@ -123,20 +120,22 @@ const addPost = new WizardScene('send-post',
     },
     //Image
     async (ctx) => {
-        const {wizard, session, scene, message: {text}, i18n, replyWithHTML, chat} = ctx
+        const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-        handleStart(ctx)
-        handleSend(ctx)
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
 
         if (+chat.id < 0) {
             return
         }
 
-        if (!text || isNaN(+text)) {
+        if (!message.text || isNaN(+message.text)) {
             return ctx.replyWithHTML(i18n.t('price'))
         }
 
-        session.price = text
+        session.price = message.text
         await ctx.replyWithHTML(
             i18n.t('image')
         )
@@ -150,10 +149,13 @@ const addPost = new WizardScene('send-post',
             session,
             message,
             i18n,
+            scene
         } = ctx
 
-        handleStart(ctx)
-        handleSend(ctx)
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
 
         const {media_group_id, photo} = message
         if (media_group_id) {
@@ -184,10 +186,12 @@ const addPost = new WizardScene('send-post',
 
     //Add More Photo
     async (ctx) => {
-        const {wizard, i18n, callbackQuery, session, message} = ctx
+        const {wizard, i18n, callbackQuery, session, message, scene} = ctx
 
-        handleStart(ctx)
-        handleSend(ctx)
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            return ctx.scene.leave()
+        }
 
         if (message && message.text) {
             return await ctx.replyWithHTML(
@@ -248,17 +252,9 @@ const addPost = new WizardScene('send-post',
             chat: {username, id}
         } = ctx
 
-        handleStart(ctx)
-        handleSend(ctx)
-
-        if (message) {
-            return replyWithHTML(
-                i18n.t('confirm') + '?',
-                Markup.inlineKeyboard([
-                        [Markup.button.callback(i18n.t('yes'), i18n.t('yes'))],
-                        [Markup.button.callback(i18n.t('no'), i18n.t('no'))]
-                    ]
-                ))
+        if (message && message.text === START) {
+            await ctx.replyWithHTML(i18n.t('welcome'))
+            await ctx.scene.leave()
         }
 
 
