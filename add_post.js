@@ -4,6 +4,7 @@ const axios = require('axios')
 const slug = require("slug");
 const {options} = require("./uitls/constants");
 const {getLink, postUser} = require("./uitls/functions");
+const {Post, Tg} = require("./models/models");
 // const data = require("./data");
 
 const PHOTO_LIMIT_COUNT = 4;
@@ -14,7 +15,7 @@ const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.esta
 const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
-        const {wizard, i18n, session, chat: {username}, message} = ctx;
+        const {wizard, i18n, session, chat: {username, id}, message, scene} = ctx;
 
         if (message && message.text === START) {
             await ctx.replyWithHTML(i18n.t('welcome'))
@@ -23,6 +24,15 @@ const addPost = new WizardScene('send-post',
 
         if (!username) {
             return ctx.replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
+        }
+        const user = await Tg.findOne({
+            where: {
+                id
+            }
+        })
+        if (user.role === 'BAN') {
+            await scene.leave()
+            return ctx.replyWithHTML('Не могу создать объявление: вы забанены!')
         }
         session.image = []
         const buttons = getButtons(i18n)
@@ -304,6 +314,18 @@ const addPost = new WizardScene('send-post',
                     [Markup.button.url(i18n.t('goToChannel'), 'https://t.me/innoads')],
                 ]
             ))
+
+        const posts = await Post.findAll({
+            where: {
+                tgId: ctx.chat.id
+            }
+        })
+
+
+        if (posts.length > 1) {
+            await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/cat-in-please-donate-to-animals-box-cartoon-vector-34194130.jpg')
+            await ctx.replyWithHTML('Спасибо, что пользуетесь нашим ботом! Мы будем рады, если вы поддержите развитие этого бота', Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
+        }
 
         const asyncRes = await Promise.all(session.image.map(async (file_id) => {
             const res = await getLink(file_id)
