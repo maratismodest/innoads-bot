@@ -33,7 +33,7 @@ bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
 
 bot.hears('/donate', async (ctx) => {
     const {i18n} = ctx
-    await ctx.replyWithPhoto('https://vh258-fm.sweb.ru/files/public_html/uploads/test/cat-in-please-donate-to-animals-box-cartoon-vector-34194130.jpg')
+    await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/donate.jpg')
     return ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
 })
 
