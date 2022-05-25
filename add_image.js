@@ -108,7 +108,7 @@ const addImage = new WizardScene('add-image',
             return res;
         }));
 
-        console.log("asyncRes", asyncRes)
+        // console.log("asyncRes", asyncRes)
 
         await scene.leave()
     }

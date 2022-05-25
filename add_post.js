@@ -8,17 +8,43 @@ const {Post, Tg} = require("./models/models");
 
 const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'
+const DONATE = '/donate'
+const PROFILE = '/profile'
 
 const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
+
+const checkCommands = async (ctx) => {
+    const {i18n, message} = ctx;
+    if (message && message.text === START) {
+        await ctx.replyWithHTML(i18n.t('welcome'))
+        return true
+    }
+    if (message && message.text === DONATE) {
+        await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/donate.jpg')
+        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
+        return true
+    }
+    if (message && message.text === PROFILE) {
+        const posts = await Post.findAll({
+            where: {
+                tgId: ctx.chat.id
+            }
+        });
+        const res = posts.map(post => [Markup.button.url(post.title, `https://innoads.ru/post/${post.slug}`)])
+        await ctx.replyWithHTML('Мои объявления', Markup.inlineKeyboard(res))
+        return true
+    }
+    return false
+}
 
 const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
         const {wizard, i18n, session, chat: {username, id}, message, scene} = ctx;
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
 
         if (!username) {
@@ -53,10 +79,11 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, i18n, replyWithHTML, callbackQuery, message, scene} = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
+
 
         if (!message) {
             await ctx.editMessageReplyMarkup({
@@ -83,13 +110,13 @@ const addPost = new WizardScene('send-post',
             session,
             i18n,
             message,
+            scene
         } = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
-
         const {text} = message
 
         if (!text) {
@@ -104,14 +131,12 @@ const addPost = new WizardScene('send-post',
     },
     //Price
     async (ctx) => {
-        const {wizard, session, message, i18n, chat} = ctx
+        const {wizard, session, message, i18n, chat, scene} = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
-
-
         if (+chat.id < 0) {
             return
         }
@@ -131,9 +156,9 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
 
         if (+chat.id < 0) {
@@ -161,9 +186,9 @@ const addPost = new WizardScene('send-post',
             scene
         } = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
 
         const {media_group_id, photo} = message
@@ -197,11 +222,10 @@ const addPost = new WizardScene('send-post',
     async (ctx) => {
         const {wizard, i18n, callbackQuery, session, message, scene} = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            return ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
-
         if (message && message.text) {
             return await ctx.replyWithHTML(
                 i18n.t('buttons.photo.add') + '?',
@@ -261,9 +285,9 @@ const addPost = new WizardScene('send-post',
             chat: {username, id}
         } = ctx
 
-        if (message && message.text === START) {
-            await ctx.replyWithHTML(i18n.t('welcome'))
-            await ctx.scene.leave()
+        const shouldLeave = await checkCommands(ctx)
+        if (shouldLeave) {
+            return await scene.leave()
         }
 
 
