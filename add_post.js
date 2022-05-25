@@ -40,21 +40,23 @@ const checkCommands = async (ctx) => {
 const addPost = new WizardScene('send-post',
     //Category
     async (ctx) => {
-        const {wizard, i18n, session, chat: {username, id}, message, scene} = ctx;
+        const {wizard, i18n, session, chat, message, scene} = ctx;
 
         const shouldLeave = await checkCommands(ctx)
         if (shouldLeave) {
             return await scene.leave()
         }
 
-        if (!username) {
+        if (!chat.username) {
             return ctx.replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
         }
-        const user = await Tg.findOne({
-            where: {
-                id
-            }
-        })
+
+        const [user, created] = await Tg.findOrCreate({
+            where: {id: chat.id},
+            defaults: {
+                ...chat
+            },
+        });
         if (user.role === 'BAN') {
             await scene.leave()
             return ctx.replyWithHTML('Не могу создать объявление: вы забанены!')
