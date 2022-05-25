@@ -5,7 +5,6 @@ const slug = require("slug");
 const {options} = require("./uitls/constants");
 const {getLink, postUser} = require("./uitls/functions");
 const {Post, Tg} = require("./models/models");
-// const data = require("./data");
 
 const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'

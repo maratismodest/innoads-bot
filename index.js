@@ -3,6 +3,7 @@ const {Telegraf, Scenes, Markup, session} = require('telegraf')
 const {Stage} = Scenes
 const path = require('path')
 const addPost = require('./add_post')
+const addImage = require('./add_image')
 const TelegrafI18n = require('telegraf-i18n')
 const sequelize = require("./db");
 const {Tg, Post} = require("./models/models");
@@ -16,6 +17,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)
+stage.register(addImage)
 bot.use(i18n.middleware())
 bot.use(session())
 bot.use(stage.middleware())
@@ -40,6 +42,10 @@ bot.hears('/donate', async (ctx) => {
 bot.hears(('/about'), (ctx) => {
     const {i18n} = ctx
     return ctx.replyWithHTML(i18n.t('about'))
+})
+
+bot.hears(('/image'), (ctx) => {
+    return ctx.scene.enter('add-image')
 })
 
 bot.hears(('/profile'), async (ctx) => {
