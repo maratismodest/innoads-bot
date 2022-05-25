@@ -368,7 +368,7 @@ const addPost = new WizardScene('send-post',
             slug: slugTitle,
             telegram: username,
             tgId: id,
-            categoryId: options.find(x => x.label == session.category).value
+            categoryId: 1
         }
 
         await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
