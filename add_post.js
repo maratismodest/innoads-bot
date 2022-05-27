@@ -13,6 +13,13 @@ const PROFILE = '/profile'
 
 const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
 
+const getSlug = (title) => slug(title) + "-" + Math.floor(Math.random() * 100)
+
+const getLinks = async (images) => await Promise.all(images.map(async (file_id) => {
+    const res = await getLink(file_id)
+    return res;
+}));
+
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
     if (message && message.text === START) {
@@ -20,8 +27,7 @@ const checkCommands = async (ctx) => {
         return true
     }
     if (message && message.text === DONATE) {
-        await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/donate.jpg')
-        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
+        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donateLink'))],]))
         return true
     }
     if (message && message.text === PROFILE) {
@@ -31,7 +37,7 @@ const checkCommands = async (ctx) => {
             }
         });
         const res = posts.map(post => [Markup.button.url(post.title, `https://innoads.ru/post/${post.slug}`)])
-        await ctx.replyWithHTML('Мои объявления', Markup.inlineKeyboard(res))
+        await ctx.replyWithHTML(i18n.t('myAds'), Markup.inlineKeyboard(res))
         return true
     }
     return false
@@ -47,7 +53,7 @@ const addPost = new WizardScene('send-post', //Category
         }
 
         if (!chat.username) {
-            return ctx.replyWithHTML('Не могу создать объявление, пока у тебя не появится алиас!')
+            return ctx.replyWithHTML(i18n.t('noAlias'))
         }
 
         const [user, created] = await Tg.findOrCreate({
@@ -57,7 +63,7 @@ const addPost = new WizardScene('send-post', //Category
         });
         if (user.role === 'BAN') {
             await scene.leave()
-            return ctx.replyWithHTML('Не могу создать объявление: вы забанены!')
+            return ctx.replyWithHTML(i18n.t('banned'))
         }
         session.image = []
         const buttons = getButtons(i18n)
@@ -84,7 +90,7 @@ const addPost = new WizardScene('send-post', //Category
         const buttons = session.buttons
 
         if (message || !callbackQuery || !callbackQuery.data || !buttons.includes(callbackQuery.data)) {
-            return ctx.reply('Внимание: выберите одну из категорий!')
+            return ctx.reply(i18n.t('chooseCategory'))
         }
 
         session.category = callbackQuery.data
@@ -168,10 +174,10 @@ const addPost = new WizardScene('send-post', //Category
                 return
             }
             session.media_group_id = media_group_id
-            return ctx.replyWithHTML('Добавлять можно только по одной фотографии. Добавьте фотографию')
+            return ctx.replyWithHTML(i18n.t('onePhoto'))
         }
         if (!photo || !photo.length || photo.length === 0) {
-            return ctx.replyWithHTML('Что-то пошло не так. Попробуйте еще раз добавить изображение')
+            return ctx.replyWithHTML(i18n.t('photoError'))
         }
 
         const getPhoto = photo.find(x => ((x.width <= 800) && (x.width >= 400))) || photo[photo.length - 1]
@@ -195,8 +201,8 @@ const addPost = new WizardScene('send-post', //Category
         }
 
         if (session.image.length === PHOTO_LIMIT_COUNT) {
-            await ctx.replyWithHTML('Лимит фото достигнут')
-            await ctx.replyWithHTML(i18n.t('confirm') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
+            await ctx.replyWithHTML(i18n.t('photoLimit'))
+            await ctx.replyWithHTML(i18n.t('confirm'), Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
             return wizard.next()
         }
 
@@ -210,13 +216,13 @@ const addPost = new WizardScene('send-post', //Category
             return wizard.back()
         }
 
-        await ctx.replyWithHTML(i18n.t('confirm') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
+        await ctx.replyWithHTML(i18n.t('confirm'), Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
         return wizard.next()
     },
 
     async (ctx) => {
         const {
-            scene, session, message, i18n, replyWithHTML, telegram, callbackQuery, chat: {username, id}
+            scene, session, i18n, telegram, callbackQuery, chat: {username, id}
         } = ctx
 
         const shouldLeave = await checkCommands(ctx)
@@ -233,7 +239,7 @@ const addPost = new WizardScene('send-post', //Category
         const cb = callbackQuery.data
         // console.log("CB", cb)
         if (cb === i18n.t('no')) {
-            await ctx.replyWithHTML('Объявление не опубликовано')
+            await ctx.replyWithHTML(i18n.t('notPublished'))
             return scene.leave()
         }
 
@@ -256,22 +262,17 @@ const addPost = new WizardScene('send-post', //Category
             }
         }))
 
-        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')], [Markup.button.url(i18n.t('goToChannel'), 'https://t.me/innoads')]]))
+        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donate'))], [Markup.button.url(i18n.t('goToChannel'), i18n.t('links.innoads'))]]))
 
-        const asyncRes = await Promise.all(session.image.map(async (file_id) => {
-            const res = await getLink(file_id)
-            return res;
-        }));
-
-        const slugTitle = slug(session.title) + "-" + Math.floor(Math.random() * 100)
+        const images = await getLinks(session.image)
 
         const formData = {
             title: session.title,
             body: session.description,
             price: session.price,
-            preview: asyncRes[0],
-            images: asyncRes.join('||'),
-            slug: slugTitle,
+            preview: images[0],
+            images: images.join('||'),
+            slug: getSlug(session.title),
             telegram: username,
             tgId: id,
             categoryId: options.find(x => x.label == session.category).value
