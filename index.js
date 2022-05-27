@@ -3,10 +3,9 @@ const {Telegraf, Scenes, Markup, session} = require('telegraf')
 const {Stage} = Scenes
 const path = require('path')
 const addPost = require('./add_post')
-const addImage = require('./add_image')
 const TelegrafI18n = require('telegraf-i18n')
 const sequelize = require("./db");
-const {Tg, Post} = require("./models/models");
+const {Post} = require("./models/models");
 
 
 const i18n = new TelegrafI18n({
@@ -17,7 +16,6 @@ const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)
-stage.register(addImage)
 bot.use(i18n.middleware())
 bot.use(session())
 bot.use(stage.middleware())
@@ -35,7 +33,6 @@ bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
 
 bot.hears('/donate', async (ctx) => {
     const {i18n} = ctx
-    await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/donate.jpg')
     return ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
 })
 
