@@ -1,6 +1,7 @@
 const axios = require("axios");
 const {Tg} = require("../models/models");
 const FormData = require('form-data');
+const SECRET = 'secret'
 
 const getLink = async (file_id) => {
     try {
@@ -11,7 +12,8 @@ const getLink = async (file_id) => {
         formData.append("image", response.data, `${Date.now()}.jpg`);
         const result = await axios.post('https://chamala.tatar/upload', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'Secret': SECRET
             }
         })
         return result.data.link
