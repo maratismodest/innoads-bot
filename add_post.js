@@ -16,8 +16,12 @@ const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.esta
 const getSlug = (title) => slug(title) + "-" + Math.floor(Math.random() * 100)
 
 const getLinks = async (images) => await Promise.all(images.map(async (file_id) => {
-    const res = await getLink(file_id)
-    return res;
+    try {
+        const res = await getLink(file_id)
+        return res;
+    } catch (e) {
+        console.log('e', e)
+    }
 }));
 
 const checkCommands = async (ctx) => {
@@ -112,6 +116,10 @@ const addPost = new WizardScene('send-post', //Category
             return await ctx.replyWithHTML(i18n.t('title'))
         }
 
+        if (text.length > 254) {
+            return await ctx.replyWithHTML(i18n.t('titleLimit'))
+        }
+
         session.title = text
         await ctx.replyWithHTML(`${i18n.t('description')}`)
         return wizard.next()
@@ -131,6 +139,11 @@ const addPost = new WizardScene('send-post', //Category
         if (!text) {
             return await ctx.replyWithHTML(i18n.t('description'))
         }
+
+        if (text.length > 1000) {
+            return await ctx.replyWithHTML(i18n.t('descriptionLimit'))
+        }
+
         session.description = text
 
         await ctx.replyWithHTML(i18n.t('price'))
