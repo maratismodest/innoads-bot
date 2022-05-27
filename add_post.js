@@ -27,7 +27,7 @@ const checkCommands = async (ctx) => {
         return true
     }
     if (message && message.text === DONATE) {
-        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donateLink'))],]))
+        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donate'))],]))
         return true
     }
     if (message && message.text === PROFILE) {
