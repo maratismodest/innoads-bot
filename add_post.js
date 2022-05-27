@@ -37,8 +37,7 @@ const checkCommands = async (ctx) => {
     return false
 }
 
-const addPost = new WizardScene('send-post',
-    //Category
+const addPost = new WizardScene('send-post', //Category
     async (ctx) => {
         const {wizard, i18n, session, chat, message, scene} = ctx;
 
@@ -52,8 +51,7 @@ const addPost = new WizardScene('send-post',
         }
 
         const [user, created] = await Tg.findOrCreate({
-            where: {id: chat.id},
-            defaults: {
+            where: {id: chat.id}, defaults: {
                 ...chat
             },
         });
@@ -65,19 +63,9 @@ const addPost = new WizardScene('send-post',
         const buttons = getButtons(i18n)
         session.buttons = buttons
 
-        await ctx.replyWithHTML(
-            i18n.t('category'),
-            Markup.inlineKeyboard([
-                [Markup.button.callback(buttons[0], buttons[0])],
-                [Markup.button.callback(buttons[1], buttons[1])],
-                [Markup.button.callback(buttons[2], buttons[2])],
-                [Markup.button.callback(buttons[3], buttons[3])],
-                [Markup.button.callback(buttons[4], buttons[4])]
-            ])
-        )
+        await ctx.replyWithHTML(i18n.t('category'), Markup.inlineKeyboard([[Markup.button.callback(buttons[0], buttons[0])], [Markup.button.callback(buttons[1], buttons[1])], [Markup.button.callback(buttons[2], buttons[2])], [Markup.button.callback(buttons[3], buttons[3])], [Markup.button.callback(buttons[4], buttons[4])]]))
         return wizard.next()
-    },
-    //Title
+    }, //Title
     async (ctx) => {
         const {wizard, session, i18n, replyWithHTML, callbackQuery, message, scene} = ctx
 
@@ -100,19 +88,12 @@ const addPost = new WizardScene('send-post',
         }
 
         session.category = callbackQuery.data
-        await ctx.replyWithHTML(
-            `Категория: #${session.category} \n${i18n.t('title')}`
-        )
+        await ctx.replyWithHTML(`Категория: #${session.category} \n${i18n.t('title')}`)
         return wizard.next()
-    },
-    //Description
+    }, //Description
     async (ctx) => {
         const {
-            wizard,
-            session,
-            i18n,
-            message,
-            scene
+            wizard, session, i18n, message, scene
         } = ctx
 
         const shouldLeave = await checkCommands(ctx)
@@ -126,12 +107,9 @@ const addPost = new WizardScene('send-post',
         }
 
         session.title = text
-        await ctx.replyWithHTML(
-            `${i18n.t('description')}`
-        )
+        await ctx.replyWithHTML(`${i18n.t('description')}`)
         return wizard.next()
-    },
-    //Price
+    }, //Price
     async (ctx) => {
         const {wizard, session, message, i18n, chat, scene} = ctx
 
@@ -149,12 +127,9 @@ const addPost = new WizardScene('send-post',
         }
         session.description = text
 
-        await ctx.replyWithHTML(
-            i18n.t('price')
-        )
+        await ctx.replyWithHTML(i18n.t('price'))
         return wizard.next()
-    },
-    //Image
+    }, //Image
     async (ctx) => {
         const {wizard, session, scene, message, i18n, replyWithHTML, chat} = ctx
 
@@ -172,20 +147,14 @@ const addPost = new WizardScene('send-post',
         }
 
         session.price = message.text
-        await ctx.replyWithHTML(
-            i18n.t('image')
-        )
+        await ctx.replyWithHTML(i18n.t('image'))
 
         return wizard.next()
     },
 
     async (ctx) => {
         const {
-            wizard,
-            session,
-            message,
-            i18n,
-            scene
+            wizard, session, message, i18n, scene
         } = ctx
 
         const shouldLeave = await checkCommands(ctx)
@@ -209,14 +178,7 @@ const addPost = new WizardScene('send-post',
 
         session.image = [...session.image, getPhoto.file_id]
 
-        await ctx.replyWithHTML(
-            i18n.t('buttons.photo.add') + '?',
-            Markup.inlineKeyboard([
-                    [Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))],
-                    [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]
-                ]
-            )
-        )
+        await ctx.replyWithHTML(i18n.t('buttons.photo.add') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))], [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]]))
         return wizard.next()
     },
 
@@ -229,28 +191,12 @@ const addPost = new WizardScene('send-post',
             return await scene.leave()
         }
         if (message && message.text) {
-            return await ctx.replyWithHTML(
-                i18n.t('buttons.photo.add') + '?',
-                Markup.inlineKeyboard([
-                        [Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))],
-                        [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]
-                    ]
-                )
-            )
+            return await ctx.replyWithHTML(i18n.t('buttons.photo.add') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('buttons.photo.add'), i18n.t('buttons.photo.add'))], [Markup.button.callback(i18n.t('buttons.photo.stop'), i18n.t('buttons.photo.stop'))]]))
         }
 
         if (session.image.length === PHOTO_LIMIT_COUNT) {
-            await ctx.replyWithHTML(
-                'Лимит фото достигнут'
-            )
-            await ctx.replyWithHTML(
-                i18n.t('confirm') + '?',
-                Markup.inlineKeyboard([
-                        [Markup.button.callback(i18n.t('yes'), i18n.t('yes'))],
-                        [Markup.button.callback(i18n.t('no'), i18n.t('no'))]
-                    ]
-                )
-            )
+            await ctx.replyWithHTML('Лимит фото достигнут')
+            await ctx.replyWithHTML(i18n.t('confirm') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
             return wizard.next()
         }
 
@@ -264,27 +210,13 @@ const addPost = new WizardScene('send-post',
             return wizard.back()
         }
 
-        await ctx.replyWithHTML(
-            i18n.t('confirm') + '?',
-            Markup.inlineKeyboard([
-                    [Markup.button.callback(i18n.t('yes'), i18n.t('yes'))],
-                    [Markup.button.callback(i18n.t('no'), i18n.t('no'))]
-                ]
-            )
-        )
+        await ctx.replyWithHTML(i18n.t('confirm') + '?', Markup.inlineKeyboard([[Markup.button.callback(i18n.t('yes'), i18n.t('yes'))], [Markup.button.callback(i18n.t('no'), i18n.t('no'))]]))
         return wizard.next()
     },
 
     async (ctx) => {
         const {
-            scene,
-            session,
-            message,
-            i18n,
-            replyWithHTML,
-            telegram,
-            callbackQuery,
-            chat: {username, id}
+            scene, session, message, i18n, replyWithHTML, telegram, callbackQuery, chat: {username, id}
         } = ctx
 
         const shouldLeave = await checkCommands(ctx)
@@ -301,56 +233,30 @@ const addPost = new WizardScene('send-post',
         const cb = callbackQuery.data
         // console.log("CB", cb)
         if (cb === i18n.t('no')) {
-            await ctx.replyWithHTML(
-                'Объявление не опубликовано'
-            )
+            await ctx.replyWithHTML('Объявление не опубликовано')
             return scene.leave()
         }
 
         await postUser(ctx.chat)
 
-        await telegram.sendMediaGroup(
-            process.env.BOT_CHAT, session.image.map((img, index) => {
-                if (index === 0) {
-                    return {
-                        "type": "photo",
-                        "media": img,
-                        "caption": i18n.t(
-                            'newPost', {
-                                category: session.category,
-                                title: session.title,
-                                description: session.description,
-                                price: session.price,
-                                alias: username
-                            }
-                        )
-                    }
-                }
+        await telegram.sendMediaGroup(process.env.BOT_CHAT, session.image.map((img, index) => {
+            if (index === 0) {
                 return {
-                    "type": "photo",
-                    "media": img,
+                    "type": "photo", "media": img, "caption": i18n.t('newPost', {
+                        category: session.category,
+                        title: session.title,
+                        description: session.description,
+                        price: session.price,
+                        alias: username
+                    })
                 }
-            })
-        )
-
-        await ctx.replyWithHTML(
-            i18n.t('thanks'),
-            Markup.inlineKeyboard([
-                    [Markup.button.url(i18n.t('goToChannel'), 'https://t.me/innoads')],
-                ]
-            ))
-
-        const posts = await Post.findAll({
-            where: {
-                tgId: ctx.chat.id
             }
-        })
+            return {
+                "type": "photo", "media": img,
+            }
+        }))
 
-
-        if (posts.length > 1) {
-            await ctx.replyWithPhoto('https://gitarist.shop/uploads/test/donate.jpg')
-            await ctx.replyWithHTML('Спасибо, что пользуетесь нашим ботом! Мы будем рады, если вы поддержите развитие этого бота', Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')],]))
-        }
+        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), 'https://pay.cloudtips.ru/p/b11b52b4')], [Markup.button.url(i18n.t('goToChannel'), 'https://t.me/innoads')]]))
 
         const asyncRes = await Promise.all(session.image.map(async (file_id) => {
             const res = await getLink(file_id)
@@ -373,9 +279,6 @@ const addPost = new WizardScene('send-post',
 
         await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
         await scene.leave()
-    }
-)
+    })
 
 module.exports = addPost
-
-// Категория: #${session.category} \n\nОписание: ${session.description} \n\nЦена: ${session.price}
