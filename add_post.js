@@ -27,7 +27,7 @@ const getLinks = async (images) => await Promise.all(images.map(async (file_id) 
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
     if (message && message.text === START) {
-        await ctx.replyWithHTML(i18n.t('welcome'))
+        await ctx.replyWithHTML(i18n.t('welcome'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
         return true
     }
     if (message && message.text === DONATE) {
@@ -276,7 +276,7 @@ const addPost = new WizardScene('send-post', //Category
         }))
 
         await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donate'))], [Markup.button.url(i18n.t('goToChannel'), i18n.t('links.innoads'))]]))
-
+        await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
         const images = await getLinks(session.image)
 
         const formData = {
@@ -292,6 +292,7 @@ const addPost = new WizardScene('send-post', //Category
         }
 
         await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
+
         await scene.leave()
     })
 
