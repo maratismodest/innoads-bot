@@ -4,7 +4,7 @@ const axios = require('axios')
 const slug = require("slug");
 const {options} = require("./uitls/constants");
 const {getLink, postUser} = require("./uitls/functions");
-const {Post, Tg} = require("./models/models");
+const {Post, Tg, Count} = require("./models/models");
 
 const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'
@@ -309,6 +309,14 @@ const addPost = new WizardScene('send-post', //Category
         ]);
         await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️')
         // await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
+        const [count] = await Count.findOrCreate({
+            where: {
+                id: 1
+            }
+        })
+        count.price = count.price + 1
+        await count.save()
+        // console.log('count', count)
         const images = await getLinks(session.image)
 
         const formData = {

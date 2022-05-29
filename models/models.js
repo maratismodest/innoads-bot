@@ -38,6 +38,11 @@ const User = sequelize.define("user",{
     token: { type: DataTypes.STRING },
 });
 
+const Count = sequelize.define("count",{
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    price: { type: DataTypes.INTEGER, defaultValue: 0 },
+});
+
 // User.hasMany(Post)
 Tg.hasMany(Post);
 // Post.belongsTo(User)
@@ -49,5 +54,6 @@ module.exports = {
     Post,
     Category,
     Tg,
-    User
+    User,
+    Count
 };
