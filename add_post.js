@@ -24,6 +24,28 @@ const getLinks = async (images) => await Promise.all(images.map(async (file_id) 
     }
 }));
 
+const ispeaker = {
+    media: 'https://chamala.tatar/uploads/1653637130801-1653637129701.jpg',
+    category: 'Услуги',
+    title: 'Индивидуальные занятия по английскому языку',
+    description: 'Индивидуальные занятия онлайн для детей и взрослых.\n' +
+        '\n' +
+        'Для вас:\n' +
+        '-💎определение уровня \n' +
+        '-💎постановка цели\n' +
+        '-💎индивидуальная программа и длительность курса\n' +
+        '-💎помощь с домашними заданиями \n' +
+        '-💎развитие разговорной речи\n' +
+        '-💎результат\n' +
+        '- 💎помощь в поддержании уровня \n' +
+        '\n' +
+        'Первая консультация 15 мин. бесплатно. 💡\n' +
+        '\n' +
+        '#iSpeaker',
+    price: 700,
+    alias: 'ispeaker_innopolis'
+}
+
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
     if (message && message.text === START) {
@@ -49,7 +71,7 @@ const checkCommands = async (ctx) => {
 
 const addPost = new WizardScene('send-post', //Category
     async (ctx) => {
-        const {wizard, i18n, session, chat, message, scene} = ctx;
+        const {wizard, i18n, session, chat, telegram, scene} = ctx;
 
         const shouldLeave = await checkCommands(ctx)
         if (shouldLeave) {
@@ -274,9 +296,19 @@ const addPost = new WizardScene('send-post', //Category
                 "type": "photo", "media": img,
             }
         }))
-
-        await ctx.replyWithHTML(i18n.t('donate'), Markup.inlineKeyboard([[Markup.button.url(i18n.t('donateLink'), i18n.t('links.donate'))], [Markup.button.url(i18n.t('goToChannel'), i18n.t('links.innoads'))]]))
-        await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
+        await ctx.replyWithMediaGroup([
+            {
+                type: "photo", media: ispeaker.media, caption: i18n.t('newPost', {
+                    category: ispeaker.category,
+                    title: ispeaker.title,
+                    description: ispeaker.description,
+                    price: ispeaker.price,
+                    alias: ispeaker.alias
+                })
+            },
+        ]);
+        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️')
+        // await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
         const images = await getLinks(session.image)
 
         const formData = {
@@ -294,6 +326,7 @@ const addPost = new WizardScene('send-post', //Category
         await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
 
         await scene.leave()
-    })
+    }
+)
 
 module.exports = addPost
