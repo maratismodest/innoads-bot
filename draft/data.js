@@ -1,4 +1,4 @@
-const BOT_BACKEND = 'https://innoads-backend.herokuapp.com'
+const BOT_BACKEND = 'https://chamala.tatar'
 
 // InnoAdsHelpBot
 // const BOT_TOKEN = '5142455295:AAEVfMbX6K03WGB7fse_Mpqr8V80uQQA1IE'
