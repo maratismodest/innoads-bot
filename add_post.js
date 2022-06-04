@@ -24,6 +24,12 @@ const getLinks = async (images) => await Promise.all(images.map(async (file_id) 
     }
 }));
 
+export const requestConfig = {
+    headers: {
+        secret: `${process.env.NEXT_PUBLIC_SECRET}`
+    },
+}
+
 const ispeaker = {
     media: 'https://chamala.tatar/uploads/1653637130801-1653637129701.jpg',
     category: 'Услуги',
@@ -331,7 +337,7 @@ const addPost = new WizardScene('send-post', //Category
             categoryId: options.find(x => x.label == session.category).value
         }
 
-        await axios.post(`${process.env.BOT_BACKEND}/post`, formData)
+        await axios.post(`${process.env.BOT_BACKEND}/post`, formData, requestConfig)
 
         await scene.leave()
     }
