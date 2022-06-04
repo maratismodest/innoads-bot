@@ -24,7 +24,7 @@ const getLinks = async (images) => await Promise.all(images.map(async (file_id) 
     }
 }));
 
-export const requestConfig = {
+const requestConfig = {
     headers: {
         secret: 'secret'
     },
