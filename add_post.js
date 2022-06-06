@@ -11,7 +11,7 @@ const START = '/start'
 const DONATE = '/donate'
 const PROFILE = '/profile'
 
-const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.vacation')]
+const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.free')]
 
 const getSlug = (title) => slug(title) + "-" + Math.floor(Math.random() * 100)
 

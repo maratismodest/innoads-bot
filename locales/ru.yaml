@@ -37,6 +37,7 @@ categories:
   service: 'Услуги'
   vacation: 'Вакансии'
   estate: 'Недвижимость'
+  free: 'Даром'
 
 links:
   innoads: 'https://t.me/innoads'
