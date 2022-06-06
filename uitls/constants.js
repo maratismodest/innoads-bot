@@ -4,6 +4,7 @@ const options = [
     {value: 3, label: "Услуги"},
     {value: 4, label: "Вакансии"},
     {value: 5, label: "Недвижимость"},
+    {value: 7, label: "Даром"},
 ];
 
 module.exports = {
