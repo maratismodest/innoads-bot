@@ -298,7 +298,7 @@ const addPost = new WizardScene('send-post', //Category
                 alias: ispeaker.alias
             })
         },]);
-        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик:\n info@innoads.ru')
+        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик:\n info@innoads.ru \n Стоимость одного показа - 5 рублей. Минимум 100 показов')
         // await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
         const [count] = await Count.findOrCreate({
             where: {
