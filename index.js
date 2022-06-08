@@ -52,7 +52,8 @@ bot.hears(('/profile'), async (ctx) => {
         }
     });
     const res = posts.map(post => [Markup.button.url(post.title, `https://innoads.ru/post/${post.slug}`)])
-    return ctx.replyWithHTML('Мои объявления', Markup.inlineKeyboard(res))
+    await ctx.replyWithHTML('Мои объявления', Markup.inlineKeyboard(res))
+    return ctx.replyWithHTML('Для создания, редактирования, повторной публикации ваших объявлений можете зайти в личный кабинет на сайте', Markup.inlineKeyboard([Markup.button.url('Личный кабинет', `https://innoads.ru/profile`)]))
 })
 
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
