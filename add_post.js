@@ -2,8 +2,8 @@ const {Scenes, Markup} = require('telegraf');
 const {WizardScene} = Scenes
 const axios = require('axios')
 const slug = require("slug");
-const {options} = require("./uitls/constants");
-const {getLink, postUser} = require("./uitls/functions");
+const {options, promotions} = require("./uitls/constants");
+const {getLink, postUser, randomInteger} = require("./uitls/functions");
 const {Post, Tg, Count} = require("./models/models");
 
 const PHOTO_LIMIT_COUNT = 4;
@@ -30,14 +30,6 @@ const requestConfig = {
     },
 }
 
-const ispeaker = {
-    media: 'https://chamala.tatar/uploads/1653637130801-1653637129701.jpg',
-    category: 'Услуги',
-    title: 'Индивидуальные занятия по английскому языку',
-    description: 'Индивидуальные занятия онлайн для детей и взрослых.\n' + '\n' + 'Для вас:\n' + '-💎определение уровня \n' + '-💎постановка цели\n' + '-💎индивидуальная программа и длительность курса\n' + '-💎помощь с домашними заданиями \n' + '-💎развитие разговорной речи\n' + '-💎результат\n' + '- 💎помощь в поддержании уровня \n' + '\n' + 'Первая консультация 15 мин. бесплатно. 💡',
-    price: 700,
-    alias: 'ispeaker_innopolis'
-}
 
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
@@ -289,23 +281,26 @@ const addPost = new WizardScene('send-post', //Category
                 "type": "photo", "media": img,
             }
         }))
+
+        const aRandomCount = randomInteger(1, 2)
+        const promoted = promotions.find(x => x.id === aRandomCount) || promotions[0]
         await ctx.replyWithMediaGroup([{
-            type: "photo", media: ispeaker.media, caption: i18n.t('newPost', {
-                category: ispeaker.category,
-                title: ispeaker.title,
-                description: ispeaker.description,
-                price: ispeaker.price,
-                alias: ispeaker.alias
+            type: "photo", media: promoted.media, caption: i18n.t('newPost', {
+                category: promoted.category,
+                title: promoted.title,
+                description: promoted.description,
+                price: promoted.price,
+                alias: promoted.alias
             })
         },]);
-        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик:\n info@innoads.ru \n Стоимость одного показа - 5 рублей. Минимум 100 показов')
+        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
         // await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
         const [count] = await Count.findOrCreate({
             where: {
-                id: 1
+                id: promoted.id
             }
         })
-        count.price = count.price + 1
+        count.price = count.price - 5
         await count.save()
         // console.log('count', count)
         const images = await getLinks(session.image)
