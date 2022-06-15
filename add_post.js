@@ -282,9 +282,9 @@ const addPost = new WizardScene('send-post', //Category
             }
         }))
 
-        const aRandomCount = randomInteger(1, 2)
-        const promoted = promotions.find(x => x.id === aRandomCount) || promotions[0]
-        // const promoted = promotions[0]
+        // const aRandomCount = randomInteger(1, 2)
+        // const promoted = promotions.find(x => x.id === aRandomCount) || promotions[0]
+        const promoted = promotions[1]
         await ctx.replyWithMediaGroup([{
             type: "photo", media: promoted.media, caption: promoted.description
         },]);
