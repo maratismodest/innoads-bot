@@ -35,13 +35,23 @@ const requestConfig = {
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
     if (message && message.text === START) {
-        return ctx.replyWithHTML(i18n.t('welcome'), Markup.inlineKeyboard([
+        await ctx.replyWithHTML(i18n.t('welcome'), {
+            reply_markup: {
+                remove_keyboard: true
+            }
+        })
+        await ctx.replyWithHTML('Чтобы подать объявление, нажмите кнопку', Markup.inlineKeyboard([
             [Markup.button.callback('Подать объявление', 'add')]
         ]).resize())
         return true
     }
     if (message && message.text === ADD) {
-        return ctx.replyWithHTML('Подать объявление?', Markup.inlineKeyboard([
+        await ctx.replyWithHTML(i18n.t('welcome'), {
+            reply_markup: {
+                remove_keyboard: true
+            }
+        })
+        await ctx.replyWithHTML('Чтобы подать объявление, нажмите кнопку', Markup.inlineKeyboard([
             [Markup.button.callback('Подать объявление', 'add')]
         ]).resize())
         return true

@@ -37,8 +37,12 @@ bot.start(async (ctx) => {
     } catch (e) {
         console.log('ERROR', e)
     }
-    await Markup.removeKeyboard()
-    return ctx.replyWithHTML(i18n.t('welcome'), Markup.inlineKeyboard([
+    await ctx.replyWithHTML(i18n.t('welcome'), {
+        reply_markup: {
+            remove_keyboard: true
+        }
+    })
+    await ctx.replyWithHTML('Чтобы подать объявление, нажмите кнопку', Markup.inlineKeyboard([
         [Markup.button.callback('Подать объявление', 'add')]
     ]).resize())
 })
