@@ -9,6 +9,8 @@ const sequelize = require("./db");
 const {Post, Tg} = require("./models/models");
 
 
+// Markup.keyboard([[i18n.t('buttons.addPost')]]).resize()
+
 const i18n = new TelegrafI18n({
     defaultLanguage: 'ru', allowMissing: false, directory: path.resolve(__dirname, 'locales'), locale: 'ru'
 })
@@ -32,17 +34,23 @@ bot.start(async (ctx) => {
                 ...chat
             },
         });
-    }
-    catch (e) {
+    } catch (e) {
         console.log('ERROR', e)
     }
 
-    return ctx.replyWithHTML(i18n.t('welcome'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
+    return ctx.replyWithHTML(i18n.t('welcome'), Markup.inlineKeyboard([
+        [Markup.button.callback('Подать объявление', 'add')]
+    ]).resize())
 })
 
-bot.hears(TelegrafI18n.match('buttons.addPost'), (ctx) => {
+bot.action('add', (ctx) => {
     return ctx.scene.enter('send-post')
 })
+
+bot.hears('/add', (ctx) => {
+    return ctx.scene.enter('send-post')
+})
+
 
 bot.hears('/donate', async (ctx) => {
     const {i18n} = ctx

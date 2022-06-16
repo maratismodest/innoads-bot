@@ -10,6 +10,7 @@ const PHOTO_LIMIT_COUNT = 4;
 const START = '/start'
 const DONATE = '/donate'
 const PROFILE = '/profile'
+const ADD = '/add'
 
 const getButtons = (i18n) => [i18n.t('categories.sell'), i18n.t('categories.estate'), i18n.t('categories.buy'), i18n.t('categories.service'), i18n.t('categories.free')]
 
@@ -34,7 +35,15 @@ const requestConfig = {
 const checkCommands = async (ctx) => {
     const {i18n, message} = ctx;
     if (message && message.text === START) {
-        await ctx.replyWithHTML(i18n.t('welcome'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
+        return ctx.replyWithHTML(i18n.t('welcome'), Markup.inlineKeyboard([
+            [Markup.button.callback('Подать объявление', 'add')]
+        ]).resize())
+        return true
+    }
+    if (message && message.text === ADD) {
+        return ctx.replyWithHTML('Подать объявление?', Markup.inlineKeyboard([
+            [Markup.button.callback('Подать объявление', 'add')]
+        ]).resize())
         return true
     }
     if (message && message.text === DONATE) {
