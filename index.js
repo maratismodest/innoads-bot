@@ -3,9 +3,10 @@ const {Telegraf, Scenes, Markup, session} = require('telegraf')
 const {Stage} = Scenes
 const path = require('path')
 const addPost = require('./add_post')
+const search = require('./search')
 const TelegrafI18n = require('telegraf-i18n')
 const sequelize = require("./db");
-const {Post} = require("./models/models");
+const {Post, Tg} = require("./models/models");
 
 
 const i18n = new TelegrafI18n({
@@ -16,14 +17,26 @@ const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const stage = new Stage()
 stage.register(addPost)
+stage.register(search)
 bot.use(i18n.middleware())
 bot.use(session())
 bot.use(stage.middleware())
 
 bot.start(async (ctx) => {
-    const {i18n} = ctx
+    const {i18n, chat} = ctx
     await sequelize.authenticate();
     await sequelize.sync()
+    try {
+        await Tg.findOrCreate({
+            where: {id: chat.id}, defaults: {
+                ...chat
+            },
+        });
+    }
+    catch (e) {
+        console.log('ERROR', e)
+    }
+
     return ctx.replyWithHTML(i18n.t('welcome'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
 })
 
@@ -43,6 +56,10 @@ bot.hears(('/about'), (ctx) => {
 
 bot.hears(('/image'), (ctx) => {
     return ctx.scene.enter('add-image')
+})
+
+bot.hears(('/search'), (ctx) => {
+    return ctx.scene.enter('search')
 })
 
 bot.hears(('/profile'), async (ctx) => {
