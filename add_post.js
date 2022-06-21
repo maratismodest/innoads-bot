@@ -303,10 +303,10 @@ const addPost = new WizardScene('send-post', //Category
 
         // const aRandomCount = randomInteger(1, 2)
         // const promoted = promotions.find(x => x.id === aRandomCount) || promotions[0]
-        const promoted = promotions[1]
-        await ctx.replyWithMediaGroup([{
-            type: "photo", media: promoted.media, caption: promoted.description
-        },]);
+        // const promoted = promotions[1]
+        // await ctx.replyWithMediaGroup([{
+        //     type: "photo", media: promoted.media, caption: promoted.description
+        // },]);
         // await ctx.replyWithMediaGroup([{
         //     type: "photo", media: promoted.media, caption: i18n.t('newPost', {
         //         category: promoted.category,
@@ -316,7 +316,7 @@ const addPost = new WizardScene('send-post', //Category
         //         alias: promoted.alias
         //     })
         // },]);
-        // await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
+        await ctx.replyWithHTML('Здесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
         // const [count] = await Count.findOrCreate({
         //     where: {
         //         id: promoted.id
