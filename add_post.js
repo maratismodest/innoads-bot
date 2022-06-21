@@ -316,15 +316,14 @@ const addPost = new WizardScene('send-post', //Category
         //         alias: promoted.alias
         //     })
         // },]);
-        await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
-        // await ctx.replyWithHTML(i18n.t('addAgain'), Markup.keyboard([[i18n.t('buttons.addPost')]]).resize())
-        const [count] = await Count.findOrCreate({
-            where: {
-                id: promoted.id
-            }
-        })
-        count.price = count.price - 5
-        await count.save()
+        // await ctx.replyWithHTML('⬆️Пост от нашего спонсора ⬆️.\nЗдесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
+        // const [count] = await Count.findOrCreate({
+        //     where: {
+        //         id: promoted.id
+        //     }
+        // })
+        // count.price = count.price - 5
+        // await count.save()
         // console.log('count', count)
         const images = await getLinks(session.image)
 
