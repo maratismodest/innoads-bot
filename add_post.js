@@ -339,6 +339,8 @@ const addPost = new WizardScene('send-post', //Category
             categoryId: options.find(x => x.label == session.category).value
         }
 
+        console.log('formData',formData)
+
         await axios.post(`${process.env.BOT_BACKEND}/telegram/site`, formData, requestConfig)
 
         await scene.leave()
