@@ -316,7 +316,7 @@ const addPost = new WizardScene('send-post', //Category
         //         alias: promoted.alias
         //     })
         // },]);
-        await ctx.replyWithHTML('Здесь могла бы быть ваша реклама: для этого отправьте ваше объявление на почтовый ящик: info@innoads.ru \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
+        await ctx.replyWithHTML('Здесь могла бы быть ваша реклама: для этого напишите @innoadsadmin \nСтоимость одного показа - 5 рублей. Минимум 100 показов')
         // const [count] = await Count.findOrCreate({
         //     where: {
         //         id: promoted.id
